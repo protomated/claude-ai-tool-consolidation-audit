@@ -100,6 +100,15 @@ Used in `plugin/.claude-plugin/plugin.json` and any marketing copy — keep cons
 
 > A step-by-step deadline calculator that reasons through the rule you supply, shows its work auditably, and drafts a calendar event — for solo and small-firm attorneys handling one-off or complex court date logic.
 
+## Testing
+
+Testing is manual inside Claude Desktop — there is no test runner. The root `README.md` is the canonical testing guide. It contains:
+- Setup steps (build → install → connect Google Calendar → verify skill loads)
+- 10 specific test inputs with exact text to paste and what to check for each
+- Release build verification (`npm run build` + `sha256sum -c`)
+
+Key scenarios that must pass: basic calendar-day count, weekend rollover, federal holiday rollover, business-day count, ambiguous-rule prompts (no guessing), month arithmetic edge cases, confirmation gate decline (no event created), confirmation gate confirm (event appears in Google Calendar), multiple deadlines from one rule.
+
 ## Notes
 
 - `plugin/manifest.json` has no `server` block — the plugin variant does not require one. Do not add one.
