@@ -1,14 +1,14 @@
 {
-  "name": "court-deadline-reasoning",
+  "name": "billing-narrative-drafter",
   "version": "1.0.0",
-  "description": "Court Deadline Reasoning & Calendar Drafting — Claude Desktop plugin that computes court deadlines step by step and drafts calendar events for solo and small-firm attorneys",
+  "description": "Billing Narrative & Time-Entry Drafter — Claude Desktop plugin that converts rough notes into professional billing narratives with suggested time increments for solo and small-firm attorneys",
   "private": true,
   "scripts": {
     "validate": "node scripts/validate-plugin.mjs plugin",
-    "pack": "rm -f /tmp/court-deadline-reasoning.zip && (cd plugin && zip -r /tmp/court-deadline-reasoning.zip . -x '*.DS_Store' 'node_modules/*' '*/node_modules/*' 'package-lock.json') && mv /tmp/court-deadline-reasoning.zip ./court-deadline-reasoning-v$npm_package_version.zip",
-    "checksum": "sha256sum court-deadline-reasoning-v$npm_package_version.zip | tee court-deadline-reasoning-v$npm_package_version.zip.sha256",
+    "pack": "rm -f /tmp/$npm_package_name.zip && (cd plugin && zip -r /tmp/$npm_package_name.zip . -x '*.DS_Store' 'node_modules/*' '*/node_modules/*' 'package-lock.json') && mv /tmp/$npm_package_name.zip ./$npm_package_name-v$npm_package_version.zip",
+    "checksum": "sha256sum $npm_package_name-v$npm_package_version.zip | tee $npm_package_name-v$npm_package_version.zip.sha256",
     "build": "npm run validate && npm run pack && npm run checksum",
-    "release": "npm run build && gh release create v$npm_package_version court-deadline-reasoning-v$npm_package_version.zip court-deadline-reasoning-v$npm_package_version.zip.sha256 --title \"v$npm_package_version\" --notes-file RELEASE.md",
+    "release": "npm run build && gh release create v$npm_package_version $npm_package_name-v$npm_package_version.zip $npm_package_name-v$npm_package_version.zip.sha256 --title \"v$npm_package_version\" --notes-file RELEASE.md",
     "clean": "rm -f ./*.zip ./*.zip.sha256",
     "tree": "find plugin -type f -not -path '*/node_modules/*' | sort"
   }

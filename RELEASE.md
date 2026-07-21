@@ -1,24 +1,25 @@
-# Court Deadline Reasoning & Calendar Drafting v1.0.0
+# Billing Narrative & Time-Entry Drafter v1.0.0
 
 Initial release.
 
 ## What's included
 
-### `/court-deadline` — Court Deadline Reasoning & Calendar Drafting
+### `/billing-narrative` — Billing Narrative & Time-Entry Drafter
 
-A step-by-step deadline calculator for solo and small-firm attorneys:
+A billing narrative drafter for solo and small-firm attorneys:
 
-- **Trigger date + rule in plain English:** supply the applicable procedural rule; the skill applies it. No jurisdiction-wide rule database — you own the rule; it does the arithmetic.
-- **Auditable reasoning chain:** every computation is shown step by step — counting anchor, day type, weekend and federal holiday exclusions, rollover check — so you can verify the logic, not just the result.
-- **Ambiguity resolution before computing:** if the rule leaves anything implicit (day type, counting anchor, rollover behavior, holiday scope), the skill asks before computing rather than guessing.
-- **Calendar event drafting:** after computing the deadline, the skill shows a complete Google Calendar event draft and creates it only after you confirm.
+- **Paste rough notes — get a ready-to-bill narrative:** supply shorthand, fragments, or a forwarded email; the skill produces professional past-tense billing language specific to the activity. No templates, no form fields.
+- **Clarifies before drafting, never guesses:** if the notes are ambiguous about the activity type, whether to split entries, or what time was spent, the skill asks — one question at a time — rather than filling gaps with plausible-sounding detail.
+- **Suggests a time increment:** rounds to 0.1-hour or 0.25-hour billing increments based on your preference; flags time suggestions that are estimates rather than attorney-provided figures.
+- **UTBMS/ABA task and activity codes on request:** suggest the appropriate L-code and A-code for corporate or insurance-defense billing; freeform for firms that don't use codes.
+- **Attorney review gate:** presents every draft with an explicit confirmation step before marking it ready to paste. Never submits, records, or transmits entries anywhere.
 
-Handles: service-response windows, appeal periods, statute-of-limitations landmarks, summary-judgment deadlines, discovery cutoffs, and any one-off date logic where showing the work matters.
+Handles: conference call notes, email threads, court appearance descriptions, research sessions, drafting sessions, multi-activity bundles, and any rough time record where the bottleneck is writing the narrative, not remembering what happened.
 
 ## Setup
 
-Install time: approximately 5 minutes. Connect the Google Calendar connector once in Claude Desktop → Settings → Connectors → Google Calendar, sign in with your Google account, and authorize calendar access. See `plugin/CONNECTORS.md` for step-by-step instructions.
+Install time: under 3 minutes. Download the zip, drag it into Claude Desktop's Extensions panel. No connectors to authorize. Open a new chat, type `/skills`, and verify `/billing-narrative` appears.
 
 ## Compliance
 
-Requires Claude for Work, Claude Team, or Claude Enterprise. Do not use a consumer Claude plan (Claude Pro or Personal) with confidential matter information. Every output carries a "NOT A SUBSTITUTE FOR DOCKETING SOFTWARE" header. The skill never creates calendar events without your explicit in-conversation confirmation. Computed deadlines must be verified independently before reliance.
+Requires Claude for Work, Claude Team, or Claude Enterprise. Do not use a consumer Claude plan (Claude Pro or Personal) with confidential matter information. Every output carries an "ASSISTED DRAFT — ATTORNEY REVIEW REQUIRED" header. The skill never marks an entry ready to paste without your explicit confirmation. All narratives are drafted from your notes only — no facts are invented.

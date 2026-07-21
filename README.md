@@ -1,6 +1,6 @@
-# Court Deadline Reasoning & Calendar Drafting — Claude Desktop Plugin
+# Billing Narrative & Time-Entry Drafter — Claude Desktop Plugin
 
-A Claude Desktop plugin for solo and small-firm attorneys. One skill (`/court-deadline`) takes a trigger date and the applicable rule in plain English, computes the deadline step by step with an auditable reasoning chain, and drafts a Google Calendar event on explicit attorney confirmation.
+A Claude Desktop plugin for solo and small-firm attorneys. One skill (`/billing-narrative`) takes rough time-entry notes, an email thread, or calendar event details and drafts a clean, billing-code-appropriate narrative with a suggested time increment. The attorney reviews and pastes the final entry into their billing system.
 
 Distributed free by [Protomated](https://protomated.com).
 
@@ -11,17 +11,18 @@ Distributed free by [Protomated](https://protomated.com).
 ```text
 plugin/           Installable plugin (packaged into .zip)
   .claude-plugin/plugin.json   Identity manifest
-  .mcp.json                    Declares Google Calendar connector requirement
+  .mcp.json                    Empty — no connectors required
   manifest.json                Display metadata
   prompts/system-prompt.md     Master system prompt — compliance guardrails live here
-  skills/court-deadline/
-    SKILL.md                   The single skill (deadline reasoning + calendar drafting)
+  skills/billing-narrative/
+    SKILL.md                   The single skill (narrative drafting + review gate)
 
 scripts/
   validate-plugin.mjs          Validates plugin/ structure before packing
 
 docs/
-  Court Deadline Reasoning - Technical.md   Technical specification
+  NTC-A-1.md                   Engineer onboarding: n8n track
+  PAC-A-3.md                   Engineer onboarding: Claude plugin track
 
 .github/workflows/
   validate.yml     Runs on every push/PR — validates plugin structure
@@ -34,7 +35,7 @@ docs/
 
 | Skill | What it does |
 |---|---|
-| `/court-deadline` | Takes a trigger date + rule in plain English → resolves any ambiguities → computes deadline step by step → shows full reasoning chain → offers to draft a Google Calendar event (created only on attorney confirmation) |
+| `/billing-narrative` | Takes rough notes → resolves ambiguities one question at a time → drafts a professional billing narrative with suggested time increment → presents draft for attorney review → marks entry ready to paste only after confirmation |
 
 ---
 
@@ -67,146 +68,148 @@ This is a content plugin — testing is manual inside Claude Desktop. There is n
 
 1. **Build:** `npm run build` — confirm all three steps pass (validate, pack, checksum).
 2. **Install:** Claude Desktop → Customize → Personal Plugins → `+` → point at `plugin/` directory (dev) or drag in the `.zip` (release test).
-3. **Connect Google Calendar:** Claude Desktop → Settings → Connectors → Google Calendar → Connect → sign in.
-4. **Verify skill loads:** type `/skills` in a new chat — `/court-deadline` must appear.
+3. **Verify skill loads:** type `/skills` in a new chat — `/billing-narrative` must appear.
+
+No connectors to authorize. Installation is complete after step 3.
 
 ---
 
 ### Test inputs and what to check
 
-Run each input below and verify the expected behaviour. Every test case exercises a different branch in the skill logic.
+Run each input below and verify the expected behaviour. Use synthetic or anonymized matter details for all tests.
 
 ---
 
-#### 1. Basic calendar-day count
+#### 1. Basic conference call
 
 ```
-/court-deadline served via personal service on June 15 2026 (Monday), responsive pleading due 21 calendar days after service, if deadline falls on weekend or federal holiday the next business day applies
+/billing-narrative tc w client 30 min re PI settlement, reviewed demand letter, advised to counter at 85k
 ```
 
 **Check:**
-- Reasoning chain shows Day 0 = June 15, count starts June 16
-- Raw deadline computed as July 6 (Monday) — no rollover needed
-- Compliance header present: `⚠️ NOT A SUBSTITUTE FOR DOCKETING SOFTWARE`
-- Compliance footer present: `— Prepared with Protomated Court Deadline Reasoning`
-- Skill offers to draft a calendar event and does not create one without confirmation
+- Skill asks about billing increment style (0.1 hr or 0.25 hr) before or alongside drafting — first session only
+- Narrative leads with "Conferred with client" and names the matter type and outcome
+- Suggested time: 0.5 hr (or nearest increment)
+- Compliance header present: `⚠️ ASSISTED DRAFT — ATTORNEY REVIEW REQUIRED`
+- Compliance footer present: `— Drafted with Protomated Billing Narrative Drafter`
+- Skill invites confirmation before marking entry ready to paste
 
 ---
 
-#### 2. Deadline rolls over a weekend
+#### 2. Email exchange
 
 ```
-/court-deadline order entered June 10 2026 (Wednesday), notice of appeal due 30 calendar days from entry, rolls to next business day if deadline falls on a weekend or federal holiday
+/billing-narrative responded to 3 emails from opp counsel re discovery schedule and doc production
 ```
 
 **Check:**
-- Raw deadline: July 10 (Friday) — no rollover
-- Change to June 11 as trigger to push raw deadline to July 11 (Saturday) → rolled to Monday July 13
-- Reasoning chain names the Saturday explicitly and states the rollover
+- Narrative leads with "Corresponded with opposing counsel"
+- Specifically names discovery schedule and document production — does not generalize to "re: case matters"
+- Suggested time: ~0.3 hr
+- Confirmation step present
 
 ---
 
-#### 3. Deadline lands on a federal holiday
+#### 3. Document drafting session
 
 ```
-/court-deadline complaint filed June 5 2026, defendant's answer due 21 calendar days after service completed June 5, rolls to next business day if weekend or federal holiday
+/billing-narrative drafted motion for summary judgment, reviewed 3 supporting cases, added argument re proximate cause
 ```
-
-Adjust trigger date to land the raw deadline on July 4 (Independence Day) — e.g. trigger June 13 puts Day 21 at July 4.
 
 **Check:**
-- Skill identifies July 4 as Independence Day (federal holiday)
-- Rolls to July 6 (Monday) — confirms July 6 is not itself a weekend or holiday
-- Holiday is named in the reasoning chain, not just skipped silently
+- Narrative names the motion type and the research done — not just "drafted motion"
+- Suggested time: 1.0–2.0 hr; flagged as estimate
+- Does not add facts beyond what was in the notes
 
 ---
 
-#### 4. Business-day count
+#### 4. Court appearance
 
 ```
-/court-deadline motion filed July 1 2026, opposition due 15 business days after filing, excluding weekends and federal holidays
+/billing-narrative attended scheduling conference Judge Smith, Smith v Jones, approx 45 min
 ```
 
 **Check:**
-- Skill counts forward in business days, not calendar days
-- Labor Day (first Monday of September) skipped if it falls in the window
-- Final date is further out than a raw calendar-day count would produce
-- Reasoning chain names each weekend block and any holiday skipped
+- Narrative leads with "Attended scheduling conference"
+- Includes judge name and matter name from the notes
+- Suggested time: 0.8 hr (0.1 style) or 0.75 hr (0.25 style) — nearest to 45 min
+- If increment style not yet established, skill asks before drafting
 
 ---
 
-#### 5. Ambiguous rule — no day type specified
+#### 5. Research session
 
 ```
-/court-deadline served July 7 2026, responsive pleading due 21 days after service
+/billing-narrative researched TX statute of limitations for negligence claims, reviewed 2 cases, drafted memo section on key holdings
 ```
 
 **Check:**
-- Skill does **not** compute immediately
-- Asks: "Does this rule count calendar days or business days?"
-- Only proceeds after attorney answers
-- Does not guess
+- Narrative names the research topic and output (memo section)
+- Suggested time flagged as estimate with stated basis
+- Does not invent a case count or outcome beyond what the notes say
 
 ---
 
-#### 6. Ambiguous rule — no rollover stated
+#### 6. Ambiguous notes — skill asks, does not guess
 
 ```
-/court-deadline judgment entered August 3 2026, notice of appeal due 30 calendar days from entry
+/billing-narrative worked on Smith file
 ```
 
 **Check:**
-- Skill computes the raw date
-- If raw date is a weekday and not a holiday, states the result and notes no rollover rule was supplied (or asks if one applies — either is acceptable; it must not silently apply a rollover)
+- Skill does **not** draft a narrative immediately
+- Asks what was accomplished: "What was the main thing you did on the Smith file?" or equivalent
+- Does not fill the gap with plausible-sounding activity
+- Only drafts after attorney supplies the missing facts
 
 ---
 
-#### 7. Month arithmetic
+#### 7. UTBMS codes requested
 
-```
-/court-deadline accrual date January 31 2026, statute of limitations 2 years from accrual
-```
+Run the same input as test 1, and when the skill asks about coding style, answer "UTBMS."
 
 **Check:**
-- Skill asks or states its interpretation of "2 years" (calendar years vs. exact day count)
-- Handles January 31 + 2 years = January 31 2028 correctly
-- Then try: "one month from January 31 2026" — skill must address the end-of-month edge case (February 28 vs. March 2) and ask or state which interpretation it applies
+- Draft includes a suggested L-code (e.g., L160 Settlement/Non-Binding ADR) and A-code (e.g., A106 Communicate (with client))
+- Code suggestion includes a one-line explanation of why that code was chosen
+- If the activity spans two codes, skill flags it and suggests splitting
 
 ---
 
-#### 8. Confirmation gate — decline
-
-Reach the calendar event offer and respond **no** or **skip**.
-
-**Check:**
-- No calendar event is created
-- Skill closes with the final deadline date and the "verify independently" reminder
-- Nothing is written to Google Calendar
-
----
-
-#### 9. Confirmation gate — confirm
-
-Reach the calendar event offer, review the draft, respond **yes**.
-
-**Check:**
-- Event draft shown in full before creation (title, date, time, description)
-- Event appears in Google Calendar after confirmation
-- Confirmation message tells you to verify the event in Google Calendar
-- Event description contains the compliance note
-
----
-
-#### 10. Multiple deadlines from one rule
+#### 8. Multi-activity bundle — skill offers to split
 
 ```
-/court-deadline summary judgment motion filed August 10 2026, opposition due 21 calendar days after filing, reply due 14 calendar days after opposition, all deadlines roll to next business day if weekend or federal holiday
+/billing-narrative reviewed client intake form, then drafted retainer agreement, then called client to confirm signing
 ```
 
 **Check:**
-- Two separate numbered computation blocks — one for opposition, one for reply
-- Each has its own weekend/holiday check
-- Both carry the compliance wrapper
+- Skill identifies three distinct activities
+- Asks: combined entry or separate entries?
+- If combined: narrative covers all three in sequence
+- If split: drafts three separate entries, each with its own time suggestion
+
+---
+
+#### 9. Edit and revise loop
+
+After any draft, respond: `shorter` — then respond: `looks good`.
+
+**Check:**
+- Skill produces a shorter variant without prompting the user for new inputs
+- Time suggestion carries over unchanged unless the attorney changes it
+- After "looks good," skill restates the final narrative cleanly as ready to paste
+- Offers to draft another entry for the matter
+
+---
+
+#### 10. Confirmation gate
+
+After any draft, respond: `looks good`.
+
+**Check:**
+- Entry is restated cleanly as the final ready-to-paste narrative
+- Skill does **not** submit, record, or transmit the entry anywhere
+- No billing system is accessed at any point
+- Skill offers to draft another entry; does not close the conversation unilaterally
 
 ---
 
@@ -214,7 +217,7 @@ Reach the calendar event offer, review the draft, respond **yes**.
 
 ```bash
 npm run build
-sha256sum -c court-deadline-reasoning-v1.0.0.zip.sha256
+sha256sum -c billing-narrative-drafter-v1.0.0.zip.sha256
 ```
 
 Both commands must exit 0. Install the `.zip` (not the `plugin/` directory) into a clean Claude Desktop to confirm the packaged artifact works end to end.
@@ -230,19 +233,20 @@ git tag v1.0.1
 git push origin v1.0.1
 ```
 
-The release workflow validates, builds, checksums, and publishes a GitHub Release with `court-deadline-reasoning-v1.0.1.zip` and `.sha256` attached.
+The release workflow validates, builds, checksums, and publishes a GitHub Release with `billing-narrative-drafter-v1.0.1.zip` and `.sha256` attached.
 
 ---
 
 ## Compliance
 
-The plugin enforces five non-negotiable rules, defined in `plugin/prompts/system-prompt.md` and `SKILL.md`:
+The plugin enforces six non-negotiable rules, defined in `plugin/prompts/system-prompt.md` and `SKILL.md`:
 
-1. **Confirmation gating** — Claude must show the full calendar event draft and get explicit in-conversation confirmation before creating any event.
-2. **Required output wrapper** — every skill output begins with `⚠️ NOT A SUBSTITUTE FOR DOCKETING SOFTWARE` and ends with the `— Prepared with Protomated...` footer.
+1. **Attorney review gate** — Claude must present every draft and invite confirmation before marking the entry ready to paste. It never declares a draft final unilaterally.
+2. **Required output wrapper** — every skill output begins with `⚠️ ASSISTED DRAFT — ATTORNEY REVIEW REQUIRED` and ends with the `— Drafted with Protomated Billing Narrative Drafter | Verify before billing | Not legal advice` footer.
 3. **Plan-tier warning** — consumer Claude (Personal/Pro) must not be used with confidential matter information.
-4. **Hard compliance note** — all outputs carry verbatim: "computes from the rule you provide; does not know your jurisdiction's rules; not a substitute for docketing software or your own verification."
-5. **Ambiguity resolution** — the skill must ask before computing if the rule is ambiguous on day type, counting anchor, rollover, or holiday scope. It must never guess.
+4. **No facts invented** — the skill must never add facts not present in the attorney's notes. If notes are too sparse, it asks before proceeding.
+5. **Ambiguity resolution** — the skill must ask before drafting if the activity type, multi-entry split, or time basis is unclear. It must never guess.
+6. **No external actions** — the skill never submits, records, or transmits entries to any billing system. The attorney pastes the final narrative manually.
 
 Do not weaken these constraints.
 

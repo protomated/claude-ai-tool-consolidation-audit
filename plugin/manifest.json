@@ -1,16 +1,16 @@
 {
   "manifest_version": "0.2",
-  "name": "court-deadline-reasoning",
-  "display_name": "Court Deadline Reasoning & Calendar Drafting for Law Firms",
+  "name": "billing-narrative-drafter",
+  "display_name": "Billing Narrative & Time-Entry Drafter for Law Firms",
   "version": "1.0.0",
-  "description": "One skill: /court-deadline. Supply a trigger date and the applicable rule in plain English; the skill computes the deadline step by step, shows its full reasoning chain so every calculation is auditable, and offers to draft a calendar event. Not a substitute for docketing software — the right tool for one-off and complex date logic where you need to see the work, not just the answer.",
+  "description": "One skill: /billing-narrative. Paste rough notes, an email thread, or calendar event details; the skill drafts a clean, billing-code-appropriate time-entry narrative with a suggested time increment. Attorney reviews and edits before pasting into Clio, MyCase, PracticePanther, or the Legal Billing Tracker. Assisted draft, always reviewed — never submits anything automatically.",
   "author": {
     "name": "Protomated",
     "url": "https://protomated.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/protomated/claude-court-deadline-reasoning"
+    "url": "https://github.com/protomated/claude-billing-narrative-drafter"
   },
   "license": "MIT"
 }

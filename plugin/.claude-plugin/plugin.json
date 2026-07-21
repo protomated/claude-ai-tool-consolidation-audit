@@ -1,7 +1,7 @@
 {
-  "name": "court-deadline-reasoning",
+  "name": "billing-narrative-drafter",
   "version": "1.0.0",
-  "description": "A step-by-step deadline calculator that reasons through the rule you supply, shows its work auditably, and drafts a calendar event — for solo and small-firm attorneys handling one-off or complex court date logic.",
+  "description": "A billing narrative drafter that converts rough notes into professional time-entry language, suggests a time increment, and prompts attorney review before billing — for solo and small-firm attorneys capturing time in Clio, MyCase, PracticePanther, or any billing system.",
   "author": {
     "name": "Protomated"
   }

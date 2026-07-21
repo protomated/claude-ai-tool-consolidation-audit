@@ -1,6 +1,6 @@
-# Court Deadline Reasoning & Calendar Drafting for Law Firms — Claude Desktop Plugin
+# Billing Narrative & Time-Entry Drafter for Law Firms — Claude Desktop Plugin
 
-A Claude Desktop plugin that computes court deadlines from the rule you supply, shows its step-by-step reasoning so every calculation is auditable, and offers to draft a calendar event — for solo and small-firm attorneys handling one-off or complex date logic.
+A Claude Desktop plugin that converts rough time-entry notes into professional billing narratives with suggested time increments — for solo and small-firm attorneys who lose billable hours because writing the entry after the fact is too slow.
 
 **Distributed by [Protomated](https://protomated.com) as a free download.**
 
@@ -22,88 +22,94 @@ Use one of the following:
 
 > **If you're not sure which plan you're on:** Open Claude Desktop → Help → About. If it says "Claude Pro," you are on a consumer plan. Upgrade to Claude for Work before entering any confidential matter details.
 
-### 2. This is a reasoning tool, not a docketing system
+### 2. Every narrative is a draft — you confirm before billing
 
-This plugin computes deadlines from the rule you provide. It does not know your jurisdiction's procedural rules, local court rules, or standing orders. You supply the applicable rule each time; it applies it. Verify every computed date independently before relying on it.
+This plugin drafts from the notes you provide. It does not verify accuracy, completeness, or billing compliance. You review every entry and confirm it is correct before pasting it into your billing system.
 
-**Use docketing software for ongoing deadline management.** This plugin is for one-off and complex date logic — situations where you need to see the reasoning, not just the answer.
+### 3. This plugin does not connect to your billing system
 
-### 3. Calendar events require your explicit confirmation
-
-The plugin will not create any calendar event without showing you the full event details first and receiving your explicit in-conversation confirmation.
+The plugin operates entirely within your Claude Desktop conversation. It never submits, records, or transmits entries anywhere. You copy the final narrative and paste it into Clio, MyCase, PracticePanther, or wherever you bill.
 
 ---
 
-## Installation (under 5 minutes)
+## Installation (under 3 minutes)
 
 ### Step 1 — Download and install
 
-1. Download `court-deadline-reasoning.zip` from the [Releases page](https://github.com/protomated/claude-court-deadline-reasoning/releases).
+1. Download `billing-narrative-drafter.zip` from the [Releases page](https://github.com/protomated/claude-billing-narrative-drafter/releases).
 2. Double-click the `.zip` file, or drag it into Claude Desktop's **Extensions** panel.
-3. Claude Desktop will install the plugin and prompt you to connect the required connector.
+3. Claude Desktop will install the plugin.
 
-### Step 2 — Connect Google Calendar
+No connectors to authorize. No credentials to configure.
 
-1. Go to **Claude Desktop → Settings → Connectors**.
-2. Find **Google Calendar** and click **Connect**.
-3. Sign in with the Google account that holds your firm's calendar.
-4. Authorize calendar access when prompted.
+### Step 2 — Verify
 
-> **Tip:** Use a firm Google Workspace account rather than a personal Gmail if your firm runs on Google Workspace. That keeps deadline events inside your firm calendar.
-
-### Step 3 — Verify
-
-Open a new Claude Desktop chat. Type `/skills`. You should see `/court-deadline` listed. Run `/court-deadline` to start.
-
-See [CONNECTORS.md](CONNECTORS.md) for troubleshooting.
+Open a new Claude Desktop chat. Type `/skills`. You should see `/billing-narrative` listed. Run `/billing-narrative` to start.
 
 ---
 
 ## The Skill
 
-### `/court-deadline` — Court Deadline Reasoning & Calendar Drafting
+### `/billing-narrative` — Billing Narrative & Time-Entry Drafter
 
-Provide a trigger date and the applicable rule in plain English. The skill computes the deadline with a full step-by-step reasoning chain, then offers to draft a calendar event.
+Paste your rough notes. The skill asks one clarifying question at a time if anything is unclear, then drafts a clean, professional billing narrative with a suggested time increment. You review, edit if needed, and paste into your billing system.
 
-**What it handles:**
-- Calendar-day counts (21 days after service, 30 days from entry of judgment)
-- Business-day counts (15 business days, excluding weekends and federal holidays)
-- Week and month arithmetic (4 weeks from filing, 6 months from accrual)
-- Federal holiday exclusions (built-in U.S. federal holiday calendar)
-- Next-business-day rollover when deadlines land on weekends or holidays
-- Multiple related deadlines from a single rule set
+**What you supply:**
+- Rough notes — abbreviations, shorthand, and fragments are fine
+- Optionally: matter name, date, time estimate, billing increment style (0.1 hr or 0.25 hr), UTBMS code preference
 
-**What you supply each time:**
-- The trigger date and what it represents
-- The applicable rule in plain English
-- Optionally: matter name, court name, opposing party, event type
+**What it produces:**
+- A ready-to-paste billing narrative in professional past-tense billing language
+- A suggested time increment (rounded to your increment style)
+- UTBMS/ABA task and activity codes if you want them
 
 **What it does not do:**
-- It does not know your jurisdiction's rules — you supply the rule
-- It does not know state or local holidays — supply those dates if the rule references them
-- It does not create calendar events without your confirmation
+- It does not submit entries to any billing system — you paste it yourself
+- It does not invent facts not in your notes
+- It does not verify the accuracy of your time record
+
+**Example inputs:**
 
 ```
-/court-deadline
-/court-deadline served June 15 2026, responsive pleading 21 calendar days after service
+/billing-narrative tc w client 30 min re PI settlement, reviewed demand, advised to counter at 85k
+/billing-narrative drafted MSJ, reviewed 3 supporting cases, added argument re proximate cause
+/billing-narrative attended scheduling conference Judge Smith, Smith v Jones, approx 45 min
+/billing-narrative responded to 4 emails from opp counsel re discovery schedule and doc production
 ```
 
-**Typical use time:** under 2 minutes once you have the rule in hand.
-**Setup:** under 5 minutes.
+**Typical use time:** under 2 minutes per entry once you have your notes in hand.
+**Setup:** under 3 minutes.
+
+---
+
+## Testing guide
+
+Run these inputs to verify the plugin is working correctly. Use synthetic or anonymized matter details.
+
+1. **Basic conference call** — paste: `tc w client 30 min re PI settlement, reviewed demand letter, advised to counter` → expect: professional narrative, 0.5 hr suggestion, ask about increment style first session
+2. **Email exchange** — paste: `responded to 3 emails from opp counsel re discovery schedule` → expect: narrative leading with "Corresponded with opposing counsel," time suggestion ~0.3 hr
+3. **Document drafting** — paste: `drafted motion for summary judgment, incorporated 3 cases, added proximate cause argument` → expect: specific narrative naming the motion and work done, time suggestion 1.0–2.0 hr depending on context
+4. **Court appearance** — paste: `attended scheduling conference, Judge Smith, Smith v Jones, 45 min` → expect: narrative with "Attended scheduling conference," 0.8 hr (nearest 0.1), or asks increment style
+5. **Research session** — paste: `researched TX statute of limitations for negligence claims, reviewed 2 cases, drafted memo section` → expect: narrative naming the research and output, flags time as estimate
+6. **Ambiguous notes (skill asks, does not guess)** — paste: `worked on Smith file` → expect: skill asks what was done before drafting, does not invent activity
+7. **UTBMS codes** — paste same as #1, answer "yes" to UTBMS question → expect: L160 + A106 or equivalent suggested, with explanation
+8. **Multi-activity entry** — paste: `reviewed contract, drafted client email summary, then researched indemnity clause law` → expect: skill asks whether to combine or split into separate entries
+9. **Edit loop** — after first draft, say "shorter" → expect: revised narrative, same time suggestion, re-invites confirmation
+10. **Confirmation gate** — after any draft, say "looks good" → expect: final narrative restated cleanly as ready-to-paste, offer to draft another entry
 
 ---
 
 ## Why This Matters
 
-Missed deadlines are the leading cause of legal malpractice claims — approximately 24.6% of all claims. Yet only 27% of solo practitioners use dedicated docketing software. The gap shows up most in one-off situations: an unusual service method, a complex statutory period, a deadline that chains off another deadline. That is where this plugin helps.
+Research consistently shows that 14% of billable hours go unrecorded — most of it because writing the narrative after the fact is slow, tedious, and gets skipped when attorneys are busy. For a solo attorney billing 1,200 hours a year at $300/hr, that is $50,000 left on the table annually. For a firm doing $1M in fees, it is closer to $140,000.
 
-The differentiator from a spreadsheet formula is the reasoning trace. You can read every step, verify every exclusion, and catch any error before it becomes a missed deadline.
+The bottleneck is the narrative, not the time. Attorneys know what they did. They just don't have a fast way to turn that into billing-appropriate language. This plugin closes that gap in under 2 minutes per entry.
 
 ---
 
-## Want a System That Knows Your Rules?
+## Want a System That Captures Time Automatically?
 
-This plugin requires you to supply the rule each time. Protomated can build a custom deadline management system integrated with your case management software, pre-loaded with the rule sets for every jurisdiction you file in — $5,000–$15,000 depending on scope.
+This plugin still requires you to paste your notes. Protomated can build a custom time-capture system that pulls from your calendar and email automatically, drafts narratives in bulk, and syncs directly to your billing software — $5,000–$15,000 depending on scope.
 
 [Book a 30-minute call →](https://protomated.com/call)
 
@@ -115,4 +121,4 @@ MIT. See [LICENSE](LICENSE).
 
 ## Feedback and Issues
 
-[GitHub Issues](https://github.com/protomated/claude-court-deadline-reasoning/issues) | [hello@protomated.com](mailto:hello@protomated.com)
+[GitHub Issues](https://github.com/protomated/claude-billing-narrative-drafter/issues) | [hello@protomated.com](mailto:hello@protomated.com)
