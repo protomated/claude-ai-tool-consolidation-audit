@@ -1,6 +1,6 @@
-# AI Use Policy Generator for Law Firms — Claude Desktop Plugin
+# Court Deadline Reasoning & Calendar Drafting for Law Firms — Claude Desktop Plugin
 
-A Claude Desktop plugin that conducts a short guided interview and drafts the three compliance documents every law firm using AI tools needs: an internal AI-use policy, a client-facing AI-disclosure clause for engagement letters, and a one-page safe AI checklist — tailored to your specific tools, practice areas, and jurisdiction.
+A Claude Desktop plugin that computes court deadlines from the rule you supply, shows its step-by-step reasoning so every calculation is auditable, and offers to draft a calendar event — for solo and small-firm attorneys handling one-off or complex date logic.
 
 **Distributed by [Protomated](https://protomated.com) as a free download.**
 
@@ -8,11 +8,11 @@ A Claude Desktop plugin that conducts a short guided interview and drafts the th
 
 ## ⚠️ Required: Read This Before You Install
 
-**This section is not boilerplate. Read it before entering any firm information.**
+**This section is not boilerplate. Read it before entering any matter information.**
 
 ### 1. You must be on a qualifying Claude plan
 
-Do NOT use this plugin on a consumer Claude plan (claude.ai Personal or Claude Pro) to enter any confidential firm or client information. Consumer plans do not provide a Data Processing Agreement (DPA) covering privileged content.
+Do NOT use this plugin on a consumer Claude plan (claude.ai Personal or Claude Pro) with any confidential matter or client information. Consumer plans do not provide a Data Processing Agreement (DPA) covering privileged content.
 
 Use one of the following:
 
@@ -20,40 +20,40 @@ Use one of the following:
 - **Claude Team or Enterprise**
 - **Claude API** (with a signed DPA from Anthropic)
 
-Using a consumer plan with confidential firm information creates the same risk this plugin helps you address for your clients. See *Heppner v. Doe* (S.D.N.Y. Feb. 2026) and your state bar's AI ethics guidance.
+> **If you're not sure which plan you're on:** Open Claude Desktop → Help → About. If it says "Claude Pro," you are on a consumer plan. Upgrade to Claude for Work before entering any confidential matter details.
 
-> **If you're not sure which plan you're on:** Open Claude Desktop → Help → About. If it says "Claude Pro," you are on a consumer plan. Upgrade to Claude for Work before entering any confidential information into this plugin.
+### 2. This is a reasoning tool, not a docketing system
 
-### 2. The plugin produces starting drafts, not final documents
+This plugin computes deadlines from the rule you provide. It does not know your jurisdiction's procedural rules, local court rules, or standing orders. You supply the applicable rule each time; it applies it. Verify every computed date independently before relying on it.
 
-Every document this plugin generates must be reviewed by you — a licensed attorney — before your firm adopts or distributes it. The generated policy references your state bar's guidance; it is your responsibility to verify that guidance and ensure the policy reflects it accurately.
+**Use docketing software for ongoing deadline management.** This plugin is for one-off and complex date logic — situations where you need to see the reasoning, not just the answer.
 
-### 3. Every output requires your confirmation before saving
+### 3. Calendar events require your explicit confirmation
 
-The plugin will not write any file to your computer without asking for your explicit in-conversation confirmation first.
+The plugin will not create any calendar event without showing you the full event details first and receiving your explicit in-conversation confirmation.
 
 ---
 
-## Installation (under 10 minutes)
+## Installation (under 5 minutes)
 
 ### Step 1 — Download and install
 
-1. Download `ai-use-policy-generator.zip` from the [Releases page](https://github.com/protomated/claude-ai-use-policy-generator/releases).
+1. Download `court-deadline-reasoning.zip` from the [Releases page](https://github.com/protomated/claude-court-deadline-reasoning/releases).
 2. Double-click the `.zip` file, or drag it into Claude Desktop's **Extensions** panel.
 3. Claude Desktop will install the plugin and prompt you to connect the required connector.
 
-### Step 2 — Connect Filesystem (your firm policies folder)
+### Step 2 — Connect Google Calendar
 
 1. Go to **Claude Desktop → Settings → Connectors**.
-2. Find **Filesystem** and click **Connect**.
-3. Select the folder where you want to save generated policy documents. Example: `~/Documents/Firm-Policies` or `~/Dropbox/Admin/Policies`.
-4. Only files inside this folder will be accessible to the plugin.
+2. Find **Google Calendar** and click **Connect**.
+3. Sign in with the Google account that holds your firm's calendar.
+4. Authorize calendar access when prompted.
 
-> **Tip:** Create a dedicated `Firm-Policies` folder before connecting. The plugin will save the three generated documents there when you confirm.
+> **Tip:** Use a firm Google Workspace account rather than a personal Gmail if your firm runs on Google Workspace. That keeps deadline events inside your firm calendar.
 
 ### Step 3 — Verify
 
-Open a new Claude Desktop chat. Type `/skills`. You should see `/ai-use-policy` listed. Run `/ai-use-policy` to start the guided interview.
+Open a new Claude Desktop chat. Type `/skills`. You should see `/court-deadline` listed. Run `/court-deadline` to start.
 
 See [CONNECTORS.md](CONNECTORS.md) for troubleshooting.
 
@@ -61,42 +61,49 @@ See [CONNECTORS.md](CONNECTORS.md) for troubleshooting.
 
 ## The Skill
 
-### `/ai-use-policy` — AI Use Policy & Client-Disclosure Generator
+### `/court-deadline` — Court Deadline Reasoning & Calendar Drafting
 
-Runs a guided interview covering your firm's AI tools, what data goes into them, your client types, and your jurisdiction. Then drafts three documents:
+Provide a trigger date and the applicable rule in plain English. The skill computes the deadline with a full step-by-step reasoning chain, then offers to draft a calendar event.
 
-**Document 1 — Internal AI-Use Policy (~2 pages)**
-Covers: approved tools and tier requirements, data classification rules (what can and can't go into AI tools), required engagement-letter disclosures, supervision and review requirements, staff training, prohibited uses, incident reporting, policy review schedule, and a state ethics compliance placeholder.
+**What it handles:**
+- Calendar-day counts (21 days after service, 30 days from entry of judgment)
+- Business-day counts (15 business days, excluding weekends and federal holidays)
+- Week and month arithmetic (4 weeks from filing, 6 months from accrual)
+- Federal holiday exclusions (built-in U.S. federal holiday calendar)
+- Next-business-day rollover when deadlines land on weekends or holidays
+- Multiple related deadlines from a single rule set
 
-**Document 2 — Client-Facing AI-Disclosure Clause**
-A ready-to-paste paragraph for your engagement letter. Discloses your firm's AI tool use, confirms attorney review of all AI output, and includes an optional client opt-out provision.
+**What you supply each time:**
+- The trigger date and what it represents
+- The applicable rule in plain English
+- Optionally: matter name, court name, opposing party, event type
 
-**Document 3 — Safe AI Checklist (1 page)**
-A print-and-post operational reference covering four checkpoints: before using AI on a matter, when entering content, when reviewing output, and before sending any AI-assisted document.
-
-**Consumer-grade tool flagging:** If the interview reveals that consumer-tier AI tools (ChatGPT Plus, personal Claude, free Copilot, etc.) are being used with client data, the plugin flags each one specifically and recommends the enterprise-tier alternative.
+**What it does not do:**
+- It does not know your jurisdiction's rules — you supply the rule
+- It does not know state or local holidays — supply those dates if the rule references them
+- It does not create calendar events without your confirmation
 
 ```
-/ai-use-policy
-/ai-use-policy ~/Documents/Firm-Policies
+/court-deadline
+/court-deadline served June 15 2026, responsive pleading 21 calendar days after service
 ```
 
-**Interview time:** approximately 5–10 minutes.
-**Setup and install:** under 10 minutes.
+**Typical use time:** under 2 minutes once you have the rule in hand.
+**Setup:** under 5 minutes.
 
 ---
 
-## Why Your Firm Needs This
+## Why This Matters
 
-57% of solo attorneys and 55% of small-firm attorneys use AI tools daily. Fewer than one in five has a written AI policy. The gap is a live bar-discipline and malpractice exposure: confidentiality obligations under Model Rule 1.6, competence obligations under Model Rule 1.1, and ABA Formal Opinion 512's informed-consent requirement all apply to AI tool use with client data — and they applied the day you started using the tool.
+Missed deadlines are the leading cause of legal malpractice claims — approximately 24.6% of all claims. Yet only 27% of solo practitioners use dedicated docketing software. The gap shows up most in one-off situations: an unusual service method, a complex statutory period, a deadline that chains off another deadline. That is where this plugin helps.
 
-This plugin closes the paperwork gap in under 10 minutes.
+The differentiator from a spreadsheet formula is the reasoning trace. You can read every step, verify every exclusion, and catch any error before it becomes a missed deadline.
 
 ---
 
-## Want a Custom AI Policy Built for Your Firm?
+## Want a System That Knows Your Rules?
 
-The generated documents are a starting point. Protomated can build a custom AI governance package for your firm: tool-by-tool DPA review, jurisdiction-specific ethics-rule mapping, staff training materials, and a policy maintenance workflow — $3,000–$6,000 depending on scope.
+This plugin requires you to supply the rule each time. Protomated can build a custom deadline management system integrated with your case management software, pre-loaded with the rule sets for every jurisdiction you file in — $5,000–$15,000 depending on scope.
 
 [Book a 30-minute call →](https://protomated.com/call)
 
@@ -108,4 +115,4 @@ MIT. See [LICENSE](LICENSE).
 
 ## Feedback and Issues
 
-[GitHub Issues](https://github.com/protomated/claude-ai-use-policy-generator/issues) | [hello@protomated.com](mailto:hello@protomated.com)
+[GitHub Issues](https://github.com/protomated/claude-court-deadline-reasoning/issues) | [hello@protomated.com](mailto:hello@protomated.com)

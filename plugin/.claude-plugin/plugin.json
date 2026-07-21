@@ -1,7 +1,7 @@
 {
-  "name": "ai-use-policy-generator",
+  "name": "court-deadline-reasoning",
   "version": "1.0.0",
-  "description": "A guided interview that drafts your firm's internal AI-use policy, a client-facing AI-disclosure clause for engagement letters, and a one-page safe AI checklist — tailored to your tools, practice areas, and jurisdiction.",
+  "description": "A step-by-step deadline calculator that reasons through the rule you supply, shows its work auditably, and drafts a calendar event — for solo and small-firm attorneys handling one-off or complex court date logic.",
   "author": {
     "name": "Protomated"
   }

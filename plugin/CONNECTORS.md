@@ -6,34 +6,41 @@ This plugin uses one connector that ships with Claude Desktop. It is managed by 
 
 | Connector | What it does | Setup |
 |---|---|---|
-| **Filesystem** | Saves generated policy documents (AI-use policy, disclosure clause, safe AI checklist) to the folder you select. The plugin only writes files when you explicitly confirm. | Connect once via Claude Desktop → Settings → Connectors → Filesystem → "Connect" then select your firm policies folder |
+| **Google Calendar** | Creates calendar events for computed deadlines. The plugin only creates events when you explicitly confirm after reviewing the full event details. | Connect once via Claude Desktop → Settings → Connectors → Google Calendar → "Connect," then sign in with your Google account |
+
+> **Connector identifier note:** The connector identifier used in this plugin's `.mcp.json` is `google-calendar`. If Claude Desktop's Connectors panel uses a different name, verify the current identifier against the live connector surface and update `.mcp.json` to match.
 
 ## How to connect
 
 1. Open Claude Desktop.
 2. Go to **Settings → Connectors**.
-3. Find **Filesystem** — click **Connect**.
-4. You'll be prompted to choose a folder. Select the folder where you want your generated policy documents saved. Example: `~/Documents/Firm-Policies`.
-5. Only files inside the folder you select are accessible to the plugin.
+3. Find **Google Calendar** — click **Connect**.
+4. Sign in with the Google account that holds your firm's calendar.
+5. Authorize calendar access when the permission prompt appears.
 6. Restart Claude Desktop if prompted.
+
+> **Firm Google Workspace:** If your firm uses Google Workspace, sign in with your Workspace account (`yourname@firmname.com`) rather than a personal Gmail. Deadline events will land in your firm calendar and stay under your organization's data retention and access policies.
 
 ## What the connector can access
 
 | Connector | Can access | Cannot access |
 |---|---|---|
-| Filesystem | Files and folders inside the path you selected during setup | Any folder outside your configured allow-list |
+| Google Calendar | Events in the signed-in Google account's calendar | Events in calendars you have not authorized; other Google services |
 
 ## Privacy note
 
-The plugin conducts its interview entirely within your Claude Desktop conversation. No interview answers or generated documents are transmitted to Protomated or any third party. All data is processed under your Claude plan's data handling terms. The Filesystem connector only writes files when you explicitly confirm, and only inside the folder you selected.
+The plugin computes deadlines entirely within your Claude Desktop conversation. No matter details, trigger dates, or rule text are transmitted to Protomated or any third party. The Google Calendar connector only creates events when you explicitly confirm, and only within the calendar account you authorized. Data is processed under your Claude plan's data handling terms and Google's terms for the connected account.
 
 ## Troubleshooting
 
-**Filesystem shows "Not connected":**
-Go to Settings → Connectors → Filesystem and click Connect. Make sure you select a folder you have read/write access to.
+**Google Calendar shows "Not connected":**
+Go to Settings → Connectors → Google Calendar and click Connect. Complete the Google sign-in flow and grant calendar access when prompted.
 
-**"Permission denied" when saving a file:**
-The target folder may be outside your configured allow-list. Go to Settings → Connectors → Filesystem and verify or update the path. The plugin cannot write to folders outside the path you selected.
+**"Permission denied" when creating an event:**
+The signed-in Google account may not have write access to the target calendar. Verify that you are signed in with the correct account and that the account has create permissions for the calendar in question.
 
-**Plugin can't find the Filesystem connector:**
-Make sure you are on a qualifying Claude plan (Claude for Work, Team, or Enterprise). The Filesystem connector is not available on consumer plans. See README.md for plan requirements.
+**Plugin can't find the Google Calendar connector:**
+Make sure you are on a qualifying Claude plan (Claude for Work, Team, or Enterprise). Confirm that Google Calendar appears as an available connector in Claude Desktop → Settings → Connectors. If it does not appear, check Anthropic's current connector documentation for availability on your plan.
+
+**Event created with wrong details:**
+The plugin shows the full event draft before creating anything. If an event was created with incorrect information, delete it from Google Calendar directly and run `/court-deadline` again, reviewing the draft carefully before confirming.

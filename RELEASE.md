@@ -1,23 +1,24 @@
-# AI Use Policy Generator v1.0.0
+# Court Deadline Reasoning & Calendar Drafting v1.0.0
 
 Initial release.
 
 ## What's included
 
-### `/ai-use-policy` — AI Use Policy & Client-Disclosure Generator
+### `/court-deadline` — Court Deadline Reasoning & Calendar Drafting
 
-A guided interview that produces three compliance documents tailored to your firm's tools, practice areas, and jurisdiction:
+A step-by-step deadline calculator for solo and small-firm attorneys:
 
-1. **Internal AI-Use Policy** — governance document covering approved tools and tier requirements, data classification rules, required disclosures, supervision and review requirements, staff training, prohibited uses, incident reporting, and a state ethics compliance placeholder.
-2. **Client-Facing AI-Disclosure Clause** — a ready-to-paste paragraph for engagement letters, with an optional client opt-out provision.
-3. **Safe AI Checklist** — a one-page operational reference with four checkpoints: before using AI on a matter, when entering content, when reviewing output, and before sending any AI-assisted document.
+- **Trigger date + rule in plain English:** supply the applicable procedural rule; the skill applies it. No jurisdiction-wide rule database — you own the rule; it does the arithmetic.
+- **Auditable reasoning chain:** every computation is shown step by step — counting anchor, day type, weekend and federal holiday exclusions, rollover check — so you can verify the logic, not just the result.
+- **Ambiguity resolution before computing:** if the rule leaves anything implicit (day type, counting anchor, rollover behavior, holiday scope), the skill asks before computing rather than guessing.
+- **Calendar event drafting:** after computing the deadline, the skill shows a complete Google Calendar event draft and creates it only after you confirm.
 
-Also flags any consumer-grade AI tools (ChatGPT Plus/Pro, personal Claude, personal Copilot/Gemini/Perplexity, etc.) currently in use with client data, with specific risk notices and enterprise-tier alternatives.
+Handles: service-response windows, appeal periods, statute-of-limitations landmarks, summary-judgment deadlines, discovery cutoffs, and any one-off date logic where showing the work matters.
 
 ## Setup
 
-Install time: under 10 minutes. Connect the Filesystem connector once in Claude Desktop → Settings → Connectors → Filesystem, then point it at your firm policies folder. See `plugin/CONNECTORS.md` for step-by-step instructions.
+Install time: approximately 5 minutes. Connect the Google Calendar connector once in Claude Desktop → Settings → Connectors → Google Calendar, sign in with your Google account, and authorize calendar access. See `plugin/CONNECTORS.md` for step-by-step instructions.
 
 ## Compliance
 
-Requires Claude for Work, Claude Team, or Claude Enterprise. Do not use a consumer Claude plan (Claude Pro or Personal) with confidential firm information. Every output carries an *AI-ASSISTED DRAFT — ATTORNEY REVIEW REQUIRED* header. All three generated documents are starting drafts that require attorney review and formal firm adoption before use. The plugin never writes files without your explicit in-conversation confirmation.
+Requires Claude for Work, Claude Team, or Claude Enterprise. Do not use a consumer Claude plan (Claude Pro or Personal) with confidential matter information. Every output carries a "NOT A SUBSTITUTE FOR DOCKETING SOFTWARE" header. The skill never creates calendar events without your explicit in-conversation confirmation. Computed deadlines must be verified independently before reliance.

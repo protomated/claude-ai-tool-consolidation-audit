@@ -1,16 +1,16 @@
 {
   "manifest_version": "0.2",
-  "name": "ai-use-policy-generator",
-  "display_name": "AI Use Policy Generator for Law Firms",
+  "name": "court-deadline-reasoning",
+  "display_name": "Court Deadline Reasoning & Calendar Drafting for Law Firms",
   "version": "1.0.0",
-  "description": "One skill: /ai-use-policy. A short guided interview produces three ready-to-adopt documents: an internal AI-use policy, a client-facing AI-disclosure clause for engagement letters, and a one-page safe AI checklist. Flags consumer-grade tools that are touching client data and suggests safer alternatives. All output is a starting draft requiring attorney review and formal firm adoption.",
+  "description": "One skill: /court-deadline. Supply a trigger date and the applicable rule in plain English; the skill computes the deadline step by step, shows its full reasoning chain so every calculation is auditable, and offers to draft a calendar event. Not a substitute for docketing software — the right tool for one-off and complex date logic where you need to see the work, not just the answer.",
   "author": {
     "name": "Protomated",
     "url": "https://protomated.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/protomated/claude-ai-use-policy-generator"
+    "url": "https://github.com/protomated/claude-court-deadline-reasoning"
   },
   "license": "MIT"
 }

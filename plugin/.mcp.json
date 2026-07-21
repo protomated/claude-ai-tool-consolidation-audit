@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "filesystem": {
+    "google-calendar": {
       "type": "http",
       "url": ""
     }
