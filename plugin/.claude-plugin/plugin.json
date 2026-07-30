@@ -1,7 +1,7 @@
 {
-  "name": "billing-narrative-drafter",
+  "name": "demand-letter-drafter",
   "version": "1.0.0",
-  "description": "A billing narrative drafter that converts rough notes into professional time-entry language, suggests a time increment, and prompts attorney review before billing — for solo and small-firm attorneys capturing time in Clio, MyCase, PracticePanther, or any billing system.",
+  "description": "A demand-letter and client-correspondence drafter that populates your firm's own template with case facts and drafts plain-English client status updates — for solo and small-firm attorneys who draft near-identical correspondence by hand. Never sets a demand amount, never sends anything; attorney is author of record.",
   "author": {
     "name": "Protomated"
   }

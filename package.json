@@ -1,7 +1,7 @@
 {
-  "name": "billing-narrative-drafter",
+  "name": "demand-letter-drafter",
   "version": "1.0.0",
-  "description": "Billing Narrative & Time-Entry Drafter — Claude Desktop plugin that converts rough notes into professional billing narratives with suggested time increments for solo and small-firm attorneys",
+  "description": "Demand Letter & Client Correspondence Drafter — Claude Desktop plugin that populates a firm's demand-letter template with case facts and drafts plain-English client status updates for solo and small-firm attorneys",
   "private": true,
   "scripts": {
     "validate": "node scripts/validate-plugin.mjs plugin",

@@ -1,16 +1,16 @@
 {
   "manifest_version": "0.2",
-  "name": "billing-narrative-drafter",
-  "display_name": "Billing Narrative & Time-Entry Drafter for Law Firms",
+  "name": "demand-letter-drafter",
+  "display_name": "Demand Letter & Client Correspondence Drafter for Law Firms",
   "version": "1.0.0",
-  "description": "One skill: /billing-narrative. Paste rough notes, an email thread, or calendar event details; the skill drafts a clean, billing-code-appropriate time-entry narrative with a suggested time increment. Attorney reviews and edits before pasting into Clio, MyCase, PracticePanther, or the Legal Billing Tracker. Assisted draft, always reviewed — never submits anything automatically.",
+  "description": "One skill: /demand-letter. Attach a case folder with your facts and your firm's demand-letter template; the skill drafts a first-pass demand letter populated with those facts, or a plain-English client status-update email. Attorney sets the demand amount and reviews before sending. Assisted draft, always reviewed — never sends, files, or submits anything automatically.",
   "author": {
     "name": "Protomated",
     "url": "https://protomated.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/protomated/claude-billing-narrative-drafter"
+    "url": "https://github.com/protomated/claude-demand-letter-drafter"
   },
   "license": "MIT"
 }

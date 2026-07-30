@@ -4,19 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-**PAC-74 (CP13)** — Billing Narrative & Time-Entry Drafting. A Claude Desktop plugin for solo and small-firm attorneys. One skill (`/billing-narrative`) takes rough time-entry notes, an email thread, or calendar event details and drafts a clean, billing-code-appropriate narrative with a suggested time increment. The attorney reviews and pastes the final entry into Clio, MyCase, PracticePanther, or the Legal Billing Tracker. There is no runtime code, no MCP server, no connector, and no backend. The product is entirely content: a markdown skill file, JSON manifests, and a reference doc.
+**PAC-68 (CP7)** — Demand Letter & Client Correspondence Drafter. A Claude Desktop / Cowork plugin for solo and small-firm attorneys. One skill (`/demand-letter`) reads a case folder the attorney attaches — case facts plus their firm's own demand-letter template — and drafts a first-pass demand letter with facts populated, or a plain-English client status-update email. The attorney sets the demand amount, reviews, and sends it themselves. There is no runtime code, no MCP server, no connector, and no backend. The product is entirely content: a markdown skill file, JSON manifests, and a reference doc.
 
-Landing page: `protomated.com/templates/billing-narrative-drafter/` (WordPress — managed outside this repo).
+Cross-ref: complements PAC-23 (K3 Proactive Matter Milestone Updates, n8n) — that fires on a practice-management status-change trigger; this is the on-demand, freeform drafting counterpart for anything that doesn't fit a status-change trigger.
+
+Landing page: `protomated.com/templates/demand-letter-drafter/` (WordPress — managed outside this repo).
 
 ## Repo layout
 
 ```
 plugin/           The installable plugin (packaged into .zip bundle)
   .claude-plugin/plugin.json   Manifest validated by scripts/validate-plugin.mjs
-  .mcp.json                    Empty — this plugin requires no connectors
+  .mcp.json                    Empty — filesystem access is Cowork's implicit attached-folder model, not a connector
   manifest.json                Plugin display metadata
   prompts/system-prompt.md     Master system prompt — compliance guardrails live here
-  skills/billing-narrative/SKILL.md  The single skill; YAML frontmatter + markdown body
+  skills/demand-letter/SKILL.md  The single skill; YAML frontmatter + markdown body
 scripts/
   validate-plugin.mjs          Validates plugin/ structure before packing
 docs/
@@ -49,7 +51,7 @@ npm run tree
 
 ## Plugin format
 
-The bundle format is `.zip`. It uses the **plugin variant** (not standalone) — no bundled MCP server, no connectors. Plugin name: `billing-narrative-drafter`, current version: `1.0.0`.
+The bundle format is `.zip`. It uses the **plugin variant** (not standalone) — no bundled MCP server, no connectors. Plugin name: `demand-letter-drafter`, current version: `1.0.0`.
 
 Two manifests serve different purposes:
 - `plugin/.claude-plugin/plugin.json` — the identity manifest the validator and Claude Desktop read (`name` must be kebab-case)
@@ -60,14 +62,15 @@ The validator (`scripts/validate-plugin.mjs`) checks:
 - Each `skills/*/` subdirectory contains a `SKILL.md`
 - `agents/`, `commands/`, `hooks/` (if present) contain files with the expected extension
 
-## Skill: /billing-narrative
+## Skill: /demand-letter
 
-The single skill takes rough time-entry notes (shorthand, email threads, calendar event descriptions) and:
-1. Clarifies ambiguity before drafting — asks about activity type, whether to split bundled activities, billing increment style, and UTBMS code preference. One question at a time.
-2. Drafts a professional billing narrative in active past tense, specific to the activity, without inventing facts not in the notes.
-3. Suggests a time increment rounded to the attorney's billing style (0.1 hr or 0.25 hr), flagging estimates.
-4. Presents the draft with an explicit review invitation — the attorney confirms accuracy before the entry is marked ready to paste.
-5. Iterates on revisions as many times as needed; restates the final narrative cleanly when confirmed.
+The single skill reads case facts (and, for demand letters, the firm's own template) from an attached workspace folder or pasted input, and:
+1. Determines the output type — demand letter or client status-update email — asking if not specified.
+2. For demand letters: looks for the firm's template in the attached folder; asks rather than guessing at a structure if none is found.
+3. Clarifies ambiguity before drafting — recipient/claim details, insufficient facts, unclear audience for a status update. One question at a time.
+4. Drafts the letter or email from the facts provided, never inventing details and never setting a demand amount, apportioning liability, or reaching a legal conclusion — those are left as an explicit placeholder for the attorney.
+5. Presents the draft with an explicit review invitation — the attorney confirms accuracy before the draft is marked ready to send.
+6. Iterates on revisions as many times as needed; restates the final draft cleanly when confirmed.
 
 Each `SKILL.md` has YAML frontmatter:
 ```yaml
@@ -82,12 +85,13 @@ argument-hint: "[hint shown in Claude Desktop]"
 
 These rules are enforced in `prompts/system-prompt.md` and `SKILL.md`. Do not weaken them:
 
-1. **Attorney review gate**: Claude must present every narrative draft and invite confirmation before marking the entry ready to paste. It never declares a draft final unilaterally.
-2. **Required output wrapper**: Every skill output must begin with the "ASSISTED DRAFT — ATTORNEY REVIEW REQUIRED" header and end with the "Verify before billing | Not legal advice" footer (see `prompts/system-prompt.md` for exact text).
-3. **Plan-tier warning**: The system prompt must warn that consumer-tier Claude (claude.ai Personal / Pro) must not be used to enter confidential matter information.
-4. **No facts invented**: The skill must never add facts not present in the attorney's notes. If notes are too sparse to draft accurately, it asks before proceeding.
-5. **Ambiguity resolution**: The skill must ask before drafting if the activity type, multi-entry split, or time basis is unclear. It must never guess.
-6. **No external actions**: The skill never submits, records, or transmits entries to any billing system. The attorney pastes the final narrative manually.
+1. **Attorney review gate**: Claude must present every draft and invite confirmation before marking it ready to send. It never declares a draft final unilaterally.
+2. **No valuation, no legal conclusions**: the skill never suggests a demand amount, apportions liability, or reaches a legal conclusion — that is the attorney's judgment call. It leaves an explicit placeholder instead of guessing.
+3. **Required output wrapper**: Every skill output must carry the "ASSISTED DRAFT — ATTORNEY REVIEW REQUIRED" header and the "Verify before sending | Not legal advice" footer (see `prompts/system-prompt.md` for exact text) — both as chat-level text surrounding the draft, never inside the copyable block the attorney will send.
+4. **Plan-tier warning**: The system prompt must warn that consumer-tier Claude (claude.ai Personal / Pro) must not be used to enter confidential matter information.
+5. **No facts invented**: The skill must never add facts, treatment details, or damages figures not present in the attorney's case folder or input. If facts are too sparse to draft accurately, it asks before proceeding.
+6. **Ambiguity resolution**: The skill must ask before drafting if the output type, template, recipient details, or facts are unclear. It must never guess.
+7. **No external actions**: The skill never sends, files, submits, or transmits a letter or email to anyone. The attorney sends the final draft manually.
 
 ## Commit style
 
@@ -97,19 +101,19 @@ Do not include `Co-Authored-By` attribution lines in commit messages.
 
 Used in `plugin/.claude-plugin/plugin.json` and any marketing copy — keep consistent:
 
-> A billing narrative drafter that converts rough notes into professional time-entry language, suggests a time increment, and prompts attorney review before billing — for solo and small-firm attorneys capturing time in Clio, MyCase, PracticePanther, or any billing system.
+> A demand-letter and client-correspondence drafter that populates your firm's own template with case facts and drafts plain-English client status updates — for solo and small-firm attorneys who draft near-identical correspondence by hand. Never sets a demand amount, never sends anything; attorney is author of record.
 
 ## Testing
 
-Testing is manual inside Claude Desktop — there is no test runner. The `plugin/README.md` is the canonical testing guide. It contains:
-- Setup steps (build → install → verify skill loads)
+Testing is manual inside Claude Desktop / Cowork — there is no test runner. The `plugin/README.md` is the canonical testing guide. It contains:
+- Setup steps (build → install → attach a test case folder → verify skill loads)
 - 10 specific test inputs with exact text to paste and what to check for each
 
-Key scenarios that must pass: basic conference call narrative, email exchange, document drafting, court appearance, research session, ambiguous notes (skill asks, does not guess), UTBMS codes on request, multi-activity split prompt, edit-and-revise loop, confirmation gate (no entry marked ready until attorney confirms).
+Key scenarios that must pass: demand letter with template and full facts, demand letter with no template attached (skill asks, does not guess), sparse damages facts (skill asks, does not invent), client status-update email, output type not specified (skill asks), attorney requests a demand figure (skill declines), attorney requests a liability assessment (skill declines), no folder attached, edit-and-revise loop, confirmation gate (no draft marked ready, nothing sent, until attorney confirms).
 
 ## Notes
 
-- `plugin/.mcp.json` is `{}` — this plugin requires no connectors. Do not add a connector unless the skill explicitly needs one.
+- `plugin/.mcp.json` is `{}` — this plugin requires no connector. Case-facts and template access come from Cowork's attached-workspace-folder model, which needs no separate config. Do not add a connector unless the skill explicitly needs one.
 - `plugin/manifest.json` has no `server` block — the plugin variant does not require one. Do not add one.
 - `plugin/README.md` and `plugin/CONNECTORS.md` are end-user documentation included in the ZIP bundle; they are not internal developer docs.
 - The root `.mcp.json` is gitignored — it holds workspace-level Claude Code MCP credentials and is not part of the plugin artifact.
