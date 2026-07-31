@@ -44,6 +44,9 @@ if (manifest) {
   if (manifest.version && !/^\d+\.\d+\.\d+(?:[-+].+)?$/.test(manifest.version)) {
     fail(`Manifest \`version\` is not valid semver: "${manifest.version}"`);
   }
+  if (manifest.description && manifest.description.length > 500) {
+    fail(`Manifest \`description\` must be at most 500 characters (Claude Desktop upload limit). Got ${manifest.description.length}.`);
+  }
 }
 
 // 2. Component directories

@@ -1,7 +1,7 @@
 {
-  "name": "demand-letter-drafter",
+  "name": "estate-planning-document-assembler",
   "version": "1.0.0",
-  "description": "Demand Letter & Client Correspondence Drafter — Claude Desktop plugin that populates a firm's demand-letter template with case facts and drafts plain-English client status updates for solo and small-firm attorneys",
+  "description": "Estate Planning Document Assembler — Claude Desktop plugin that populates a basic will, healthcare power of attorney, financial power of attorney, and HIPAA authorization from one intake pass for solo and small-firm estate planning attorneys",
   "private": true,
   "scripts": {
     "validate": "node scripts/validate-plugin.mjs plugin",

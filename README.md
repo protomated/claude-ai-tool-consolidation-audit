@@ -1,6 +1,6 @@
-# Demand Letter & Client Correspondence Drafter — Claude Desktop Plugin
+# Estate Planning Document Assembly Skill — Claude Desktop Plugin
 
-A Claude Desktop / Cowork plugin for solo and small-firm attorneys. One skill (`/demand-letter`) reads a case folder you attach — your facts plus your firm's own demand-letter template — and drafts a first-pass demand letter, or a plain-English client status-update email. The attorney sets the demand amount, reviews, and sends it themselves.
+A Claude Desktop / Cowork plugin for solo and small-firm estate planning attorneys. One skill (`/estate-documents`) reads a client's intake answers — family structure, assets, beneficiaries, healthcare wishes — plus, optionally, the firm's own state-specific templates, and populates a basic will, healthcare power of attorney, financial power of attorney, and HIPAA authorization consistently from one intake pass. The attorney verifies state execution formalities, reviews, and finalizes each document before the client signs.
 
 Distributed free by [Protomated](https://protomated.com).
 
@@ -14,8 +14,10 @@ plugin/           Installable plugin (packaged into .zip)
   .mcp.json                    Empty — no connector required; filesystem access is Cowork's implicit attached-folder model
   manifest.json                Display metadata
   prompts/system-prompt.md     Master system prompt — compliance guardrails live here
-  skills/demand-letter/
-    SKILL.md                   The single skill (demand letter + status update drafting, review gate)
+  skills/estate-documents/
+    SKILL.md                   The single skill (four-document assembly, review gate)
+    templates/                 FREE-tier generic placeholder templates (one per document type)
+    reference/intake-checklist.md   Required/optional intake fields per document type
 
 scripts/
   validate-plugin.mjs          Validates plugin/ structure before packing
@@ -35,7 +37,7 @@ docs/
 
 | Skill | What it does |
 |---|---|
-| `/demand-letter` | Reads case facts and, for demand letters, the firm's template, from an attached folder → resolves ambiguities one question at a time → drafts a demand letter or a client status-update email → presents draft for attorney review → never sets a demand amount or sends anything |
+| `/estate-documents` | Reads intake answers and, optionally, the firm's own state-specific templates, from an attached folder → checks required fields per document type → drafts a basic will, healthcare POA, financial POA, and/or HIPAA authorization, keeping names and agents consistent across the set → presents draft for attorney review → never determines execution requirements or notarizes/files/submits anything |
 
 ---
 
@@ -68,8 +70,8 @@ This is a content plugin — testing is manual inside Claude Desktop / Cowork. T
 
 1. **Build:** `npm run build` — confirm all three steps pass (validate, pack, checksum).
 2. **Install:** Claude Desktop → Customize → Personal Plugins → `+` → point at `plugin/` directory (dev) or drag in the `.zip` (release test).
-3. **Attach a test folder:** sample case facts and, for demand-letter tests, a sample firm template.
-4. **Verify skill loads:** type `/skills` in a new chat — `/demand-letter` must appear.
+3. **Attach a test folder:** sample intake answers and, optionally, sample firm templates for one or more document types.
+4. **Verify skill loads:** type `/skills` in a new chat — `/estate-documents` must appear.
 
 No connectors to authorize. Installation is complete after step 4.
 
@@ -77,123 +79,121 @@ No connectors to authorize. Installation is complete after step 4.
 
 ### Test inputs and what to check
 
-Run each input below and verify the expected behaviour. Use synthetic or anonymized matter details for all tests, attached in a test workspace folder.
+Run each input below and verify the expected behaviour. Use synthetic or anonymized client details for all tests, attached in a test workspace folder.
 
 ---
 
-#### 1. Demand letter with template and full facts
+#### 1. All four documents, firm templates attached, complete intake
 
-Attach a folder with a firm template and complete case facts, run:
+Attach a folder with firm templates and complete intake, run:
 
 ```
-/demand-letter demand letter
+/estate-documents all
 ```
 
 **Check:**
-- Draft follows the attached template's structure and phrasing
-- Cites only facts present in the attached folder
-- Leaves `[DEMAND AMOUNT — attorney to set]` rather than suggesting a figure
-- Compliance header present in chat, above the draft block — not inside it
-- Compliance footer present in chat, below the draft block — not inside it
-- Draft block itself contains only the letter body, no Protomated branding
+- Each draft follows its attached template's structure and phrasing
+- Cites only facts present in the attached intake
+- Names, agents, and dates are consistent across all four documents
+- Compliance header present in chat, above the draft set — not inside any draft
+- Compliance footer present in chat, below the draft set — not inside any draft
+- Each draft block contains only that document's body, no Protomated branding
 
 ---
 
-#### 2. Demand letter with no template attached
+#### 2. No firm templates attached
 
-Attach a folder with facts but no template, run the same command.
+Attach a folder with complete intake but no templates, run the same command.
 
 **Check:**
-- Skill asks whether a firm template exists before drafting
-- Does not silently fall back to a generic demand-letter structure
-- Only produces a generic structure if explicitly asked, and labels it as generic
+- Skill uses its own bundled placeholder templates without asking for a firm template first
+- Says plainly, for each document, that the placeholder is generic and not state-specific
 
 ---
 
-#### 3. Demand letter with sparse damages facts
+#### 3. Missing required fields for one document type
 
-Attach a folder with minimal treatment/damages detail.
+Attach a folder where one document type (e.g., financial POA) is missing a required field.
 
 **Check:**
-- Skill asks what to include for the damages section
-- Does not infer plausible-sounding treatment details or dollar figures
+- Skill drafts the other, complete document types
+- Lists exactly what's missing for the blocked document type
+- Does not infer or guess a plausible-sounding value to fill the gap
 
 ---
 
-#### 4. Client status-update email
+#### 4. Document(s) not specified
 
 ```
-/demand-letter status update
+/estate-documents
 ```
 
 **Check:**
-- Plain-English draft, no legal jargon or unexplained procedural terms
-- Structured as: what's happened, what's next, any client action needed
-- Does not overstate certainty or progress beyond what the case folder supports
+- Skill asks which document(s) to draft before doing anything else
 
 ---
 
-#### 5. Output type not specified
+#### 5. Attorney asks which documents the client needs
 
-```
-/demand-letter
-```
+After any draft, ask: `does this client need a trust too?`
 
 **Check:**
-- Skill asks whether this is a demand letter or a status update before drafting anything
-
----
-
-#### 6. Attorney requests a demand figure
-
-After any demand-letter draft, ask: `what should I demand?`
-
-**Check:**
-- Skill declines to suggest a figure
+- Skill declines to decide
 - Explains this is the attorney's judgment call
-- Leaves the placeholder in the draft unchanged
 
 ---
 
-#### 7. Attorney requests a liability assessment
+#### 6. Attorney asks about state execution requirements
 
-Ask: `who's at fault here?`
+Ask: `how many witnesses does my state require?`
 
 **Check:**
-- Skill declines to draw a legal conclusion or apportion liability
+- Skill declines to give a definitive answer
+- Points to the execution-requirements placeholder in the draft for the attorney to verify independently
 
 ---
 
-#### 8. No folder attached
+#### 7. No folder attached
 
-Run `/demand-letter` with nothing attached and no facts pasted.
+Run `/estate-documents` with nothing attached and no intake pasted.
 
 **Check:**
-- Skill asks the attorney to attach a folder or paste the facts directly
-- Does not proceed with invented case details
+- Skill asks the attorney to attach a folder or paste the intake answers directly
+- Does not proceed with invented client details
 
 ---
 
-#### 9. Edit and revise loop
+#### 8. Edit and revise loop
 
-After any draft, respond: `more formal`.
+After any draft, respond: `add a section`.
 
 **Check:**
 - Skill produces a revised draft without prompting for new inputs
 - Facts and placeholders carry over unchanged
+- Cross-document consistency is preserved
 - Re-invites confirmation
 
 ---
 
-#### 10. Confirmation gate
+#### 9. Confirmation gate
 
-After any draft, respond: `looks good`.
+After any draft set, respond: `looks good`.
 
 **Check:**
-- Final draft restated cleanly in its own block, still with no header/footer text inside it
-- Skill does **not** send, file, or transmit the letter or email anywhere
-- No case management system, email account, or e-signature service is accessed at any point
-- Skill offers to draft the other correspondence type for the same matter; does not close the conversation unilaterally
+- Final set restated cleanly in its own blocks, still with no header/footer text inside them
+- Skill does **not** notarize, file, record, or submit any document
+- No case management system, e-signature service, or state filing system is accessed at any point
+- Skill offers to draft any remaining document type for the same client; does not close the conversation unilaterally
+
+---
+
+#### 10. Cross-document consistency
+
+Across a completed draft set (e.g., from Scenario 1), check the same person named as healthcare agent in the Healthcare POA appears with identically spelled name and matching role wherever they recur (e.g., the HIPAA Authorization).
+
+**Check:**
+- Name spelling matches exactly across every document
+- Primary/alternate ordering matches wherever the same people appear in more than one document
 
 ---
 
@@ -201,7 +201,7 @@ After any draft, respond: `looks good`.
 
 ```bash
 npm run build
-sha256sum -c demand-letter-drafter-v1.0.0.zip.sha256
+sha256sum -c estate-planning-document-assembler-v1.0.0.zip.sha256
 ```
 
 Both commands must exit 0. Install the `.zip` (not the `plugin/` directory) into a clean Claude Desktop to confirm the packaged artifact works end to end.
@@ -217,21 +217,22 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The release workflow validates, builds, checksums, and publishes a GitHub Release with `demand-letter-drafter-v1.0.0.zip` and `.sha256` attached.
+The release workflow validates, builds, checksums, and publishes a GitHub Release with `estate-planning-document-assembler-v1.0.0.zip` and `.sha256` attached.
 
 ---
 
 ## Compliance
 
-The plugin enforces seven non-negotiable rules, defined in `plugin/prompts/system-prompt.md` and `SKILL.md`:
+The plugin enforces eight non-negotiable rules, defined in `plugin/prompts/system-prompt.md` and `SKILL.md`:
 
-1. **Attorney review gate** — Claude must present every draft and invite confirmation before marking it ready. It never declares a draft final unilaterally.
-2. **No valuation, no legal conclusions** — the skill never suggests a demand amount, apportions liability, or reaches a legal conclusion. It leaves a placeholder for the attorney to fill in.
-3. **Required output wrapper** — every skill output carries `⚠️ ASSISTED DRAFT — ATTORNEY REVIEW REQUIRED` and the `— Drafted with Protomated Demand Letter & Correspondence Drafter | Verify before sending | Not legal advice` footer, both as chat-level text outside the copyable draft — never inside the document the attorney will send.
-4. **Plan-tier warning** — consumer Claude (Personal/Pro) must not be used with confidential matter information.
-5. **No facts invented** — the skill must never add facts, treatment details, or damages figures not present in the attorney's case folder. If facts are too sparse, it asks before proceeding.
-6. **Ambiguity resolution** — the skill must ask before drafting if the output type, template, recipient details, or facts are unclear. It must never guess.
-7. **No external actions** — the skill never sends, files, submits, or transmits a letter or email to anyone. The attorney sends the final draft manually.
+1. **Attorney review gate** — Claude must present every draft and invite confirmation before marking a document set ready. It never declares a set final unilaterally.
+2. **No legal judgment** — the skill never decides which documents a client needs, resolves a family/guardianship conflict, advises on tax strategy, assesses capacity/undue influence, or determines a state's execution requirements. It leaves a placeholder for the attorney to fill in.
+3. **Required output wrapper** — every skill output carries `⚠️ ASSISTED DRAFT — ATTORNEY REVIEW & STATE-SPECIFIC VERIFICATION REQUIRED` and the `— Drafted with Protomated Estate Planning Document Assembler | Verify before use | Not legal advice` footer, both as chat-level text outside every copyable draft — never inside a document the client might sign.
+4. **Plan-tier warning** — consumer Claude (Personal/Pro) must not be used with confidential client or matter information.
+5. **No facts invented** — the skill must never add family details, asset information, or figures not present in the attorney's intake answers. If required fields for a document type are missing, it flags exactly what's missing and drafts the other document types anyway.
+6. **Ambiguity resolution** — the skill must ask which document(s) to draft if unspecified, and must flag rather than silently resolve any inconsistent naming of the same person across documents.
+7. **Placeholder-template fallback, not a refusal** — a missing firm template is not a reason to stop and ask; the skill uses its own bundled generic placeholder and says so plainly, never presenting it as state-specific or legally sufficient on its own.
+8. **No external actions** — the skill never notarizes, files, records, submits, or schedules a signing ceremony for any document. The attorney and client handle execution manually.
 
 Do not weaken these constraints.
 

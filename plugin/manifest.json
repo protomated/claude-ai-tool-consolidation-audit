@@ -1,16 +1,16 @@
 {
   "manifest_version": "0.2",
-  "name": "demand-letter-drafter",
-  "display_name": "Demand Letter & Client Correspondence Drafter for Law Firms",
+  "name": "estate-planning-document-assembler",
+  "display_name": "Estate Planning Document Assembly Skill for Law Firms",
   "version": "1.0.0",
-  "description": "One skill: /demand-letter. Attach a case folder with your facts and your firm's demand-letter template; the skill drafts a first-pass demand letter populated with those facts, or a plain-English client status-update email. Attorney sets the demand amount and reviews before sending. Assisted draft, always reviewed — never sends, files, or submits anything automatically.",
+  "description": "One skill: /estate-documents. Attach your intake answers and, optionally, your firm's own state-specific templates; the skill populates a basic will, healthcare POA, financial POA, and HIPAA authorization from one intake pass, flagging missing required fields per document type. Attorney verifies state execution formalities and finalizes before the client signs. Assisted draft, always reviewed — never determines execution requirements or submits anything automatically.",
   "author": {
     "name": "Protomated",
     "url": "https://protomated.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/protomated/claude-demand-letter-drafter"
+    "url": "https://github.com/protomated/claude-estate-planning-document-assembler"
   },
   "license": "MIT"
 }

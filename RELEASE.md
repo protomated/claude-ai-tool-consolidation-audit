@@ -1,25 +1,26 @@
-# Demand Letter & Client Correspondence Drafter v1.0.0
+# Estate Planning Document Assembler v1.0.0
 
 Initial release.
 
 ## What's included
 
-### `/demand-letter` — Demand Letter & Client Correspondence Drafter
+### `/estate-documents` — Estate Planning Document Assembly
 
-A demand-letter and client-correspondence drafter for solo and small-firm attorneys:
+An estate planning document assembler for solo and small-firm attorneys:
 
-- **Attach a case folder — get a first-pass demand letter:** the skill reads your case facts and your firm's own demand-letter template from an attached workspace folder and drafts a populated first pass, following your firm's structure and phrasing.
-- **Or draft a plain-English client status update:** summarizes what's happened and what's next in language a client can follow, no legal jargon.
-- **Never sets a demand amount or a legal conclusion:** the skill leaves an explicit placeholder for the demand figure and declines to assess liability or case value — that stays the attorney's call.
-- **Clarifies before drafting, never guesses:** if the output type, template, recipient details, or facts are unclear, the skill asks — one question at a time — rather than filling gaps with plausible-sounding detail.
-- **Attorney review gate:** presents every draft with an explicit confirmation step before marking it ready to send. Never sends, files, or transmits anything anywhere.
+- **One intake pass, four documents:** the skill reads a client's intake answers — family structure, assets, beneficiaries, healthcare wishes — from an attached workspace folder and populates a basic will, healthcare power of attorney, financial power of attorney, and HIPAA authorization consistently from that single pass.
+- **Uses your own templates, or a generic fallback:** for each document type, the skill follows your firm's own state-specific template if you've attached one, or its own bundled generic placeholder if you haven't — clearly labeled as generic, not state-specific.
+- **Never determines execution requirements or which documents a client needs:** the skill leaves an explicit placeholder for state-specific witnessing and notarization requirements, and declines to decide whether a client needs documents beyond these four — that stays the attorney's call.
+- **Flags gaps per document, never invents facts:** if a document type's required intake fields are missing, the skill names exactly what's missing and drafts the other complete document types anyway — one gap never blocks the whole set.
+- **Keeps names and agents consistent across the set:** the same person's name, role, and ordering match across every document drafted in the same session.
+- **Attorney review gate:** presents every draft with an explicit confirmation step before marking a set ready. Never notarizes, files, records, or submits anything anywhere.
 
-Handles: demand letters populated from a firm template and case facts, and plain-English client status-update emails — the two correspondence types attorneys draft nearly identically, matter after matter.
+Handles: basic wills, healthcare powers of attorney, financial powers of attorney, and HIPAA authorizations — the document set estate planning attorneys assemble nearly identically, client after client.
 
 ## Setup
 
-Install time: about 5 minutes. Download the zip, drag it into Claude Desktop's Extensions panel, and attach a workspace folder with your case facts and (for demand letters) your firm's template. No connectors to authorize. Open a new chat, type `/skills`, and verify `/demand-letter` appears.
+Install time: about 10 minutes. Download the zip, drag it into Claude Desktop's Extensions panel, and attach a workspace folder with your client's intake answers and (optionally) your firm's own state-specific templates. No connectors to authorize. Open a new chat, type `/skills`, and verify `/estate-documents` appears.
 
 ## Compliance
 
-Requires Claude for Work, Claude Team, or Claude Enterprise. Do not use a consumer Claude plan (Claude Pro or Personal) with confidential matter information. Every output carries an "ASSISTED DRAFT — ATTORNEY REVIEW REQUIRED" header and footer, shown around the draft — never inside the document you'll send. The skill never marks a draft ready without your explicit confirmation, never sets a demand amount or liability position, and never sends anything itself. All drafts are populated from your case folder only — no facts are invented.
+Requires Claude for Work, Claude Team, or Claude Enterprise. Do not use a consumer Claude plan (Claude Pro or Personal) with confidential client or matter information. Every output carries an "ASSISTED DRAFT — ATTORNEY REVIEW & STATE-SPECIFIC VERIFICATION REQUIRED" header and footer, shown around each draft — never inside a document your client might sign. The skill never marks a document set ready without your explicit confirmation, never determines your state's execution requirements or which documents your client needs, and never notarizes, files, or submits anything itself. All drafts are populated from your intake answers only — no facts are invented.
