@@ -93,6 +93,15 @@ These rules are enforced in `prompts/system-prompt.md` and `SKILL.md`. Do not we
 6. **Ambiguity resolution**: The skill must ask before drafting if the output type, template, recipient details, or facts are unclear. It must never guess.
 7. **No external actions**: The skill never sends, files, submits, or transmits a letter or email to anyone. The attorney sends the final draft manually.
 
+## Internal QA fixtures — tests/skills/
+
+`tests/skills/<skill-name>.md` is the internal QA testing guide for a skill — a standing convention for every plugin built in this repo, alongside (not replacing) the end-user testing guide in `plugin/README.md`. The difference:
+
+- `plugin/README.md` — ships inside the plugin zip, short scenarios with pasted one-liners, aimed at an attorney verifying the install.
+- `tests/skills/<skill-name>.md` — internal only, not packaged, uses real attached-folder fixtures under `tests/skills/<skill-name>/` when the skill's input is a workspace folder rather than chat text. Deeper checks (e.g., compliance-wrapper placement, ambiguity-resolution edge cases) belong here even when they overlap with `plugin/README.md`'s scenarios.
+
+All fixture data must be clearly synthetic — fictional names, firms, matter numbers — and labeled as such at the top of each fixture file. Never use real client or matter data, even anonymized real data, without checking with Dele first.
+
 ## Commit style
 
 Do not include `Co-Authored-By` attribution lines in commit messages.
