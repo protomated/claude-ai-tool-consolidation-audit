@@ -1,16 +1,16 @@
 {
   "manifest_version": "0.2",
-  "name": "estate-planning-document-assembler",
-  "display_name": "Estate Planning Document Assembly Skill for Law Firms",
+  "name": "contract-document-reviewer",
+  "display_name": "Contract & Document Review Skill (Firm Playbook)",
   "version": "1.0.0",
-  "description": "One skill: /estate-documents. Attach your intake answers and, optionally, your firm's own state-specific templates; the skill populates a basic will, healthcare POA, financial POA, and HIPAA authorization from one intake pass, flagging missing required fields per document type. Attorney verifies state execution formalities and finalizes before the client signs. Assisted draft, always reviewed — never determines execution requirements or submits anything automatically.",
+  "description": "One skill: /contract-review. Attach a contract and, optionally, your firm's own playbook.md; the skill reviews it clause-by-clause against the playbook, flagging each clause GREEN, YELLOW, or RED with plain-English rationale and suggested redline language. Attorney reviews every rating and redline before it's used in negotiation. Assisted review, always reviewed — never decides whether to sign, negotiate, or reject a contract, and never sends, files, or executes anything.",
   "author": {
     "name": "Protomated",
     "url": "https://protomated.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/protomated/claude-estate-planning-document-assembler"
+    "url": "https://github.com/protomated/claude-contract-document-reviewer"
   },
   "license": "MIT"
 }

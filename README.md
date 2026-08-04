@@ -1,6 +1,6 @@
-# Estate Planning Document Assembly Skill — Claude Desktop Plugin
+# Contract & Document Review Skill — Claude Desktop Plugin
 
-A Claude Desktop / Cowork plugin for solo and small-firm estate planning attorneys. One skill (`/estate-documents`) reads a client's intake answers — family structure, assets, beneficiaries, healthcare wishes — plus, optionally, the firm's own state-specific templates, and populates a basic will, healthcare power of attorney, financial power of attorney, and HIPAA authorization consistently from one intake pass. The attorney verifies state execution formalities, reviews, and finalizes each document before the client signs.
+A Claude Desktop / Cowork plugin for solo and small-firm attorneys. One skill (`/contract-review`) reads an attached contract and, optionally, the firm's own `playbook.md`, and reviews it clause by clause — flagging each clause GREEN, YELLOW, RED, or UNRATED with plain-English rationale and suggested redline language. The attorney reviews every rating and redline, and applies any changes to their own document, before it's used in negotiation.
 
 Distributed free by [Protomated](https://protomated.com).
 
@@ -14,10 +14,10 @@ plugin/           Installable plugin (packaged into .zip)
   .mcp.json                    Empty — no connector required; filesystem access is Cowork's implicit attached-folder model
   manifest.json                Display metadata
   prompts/system-prompt.md     Master system prompt — compliance guardrails live here
-  skills/estate-documents/
-    SKILL.md                   The single skill (four-document assembly, review gate)
-    templates/                 FREE-tier generic placeholder templates (one per document type)
-    reference/intake-checklist.md   Required/optional intake fields per document type
+  skills/contract-review/
+    SKILL.md                   The single skill (clause-by-clause review, redline suggestions, review gate)
+    playbooks/generic-playbook.md   FREE-tier bundled generic clause playbook
+    reference/review-rubric.md      Rating rubric and playbook-entry format
 
 scripts/
   validate-plugin.mjs          Validates plugin/ structure before packing
@@ -37,7 +37,7 @@ docs/
 
 | Skill | What it does |
 |---|---|
-| `/estate-documents` | Reads intake answers and, optionally, the firm's own state-specific templates, from an attached folder → checks required fields per document type → drafts a basic will, healthcare POA, financial POA, and/or HIPAA authorization, keeping names and agents consistent across the set → presents draft for attorney review → never determines execution requirements or notarizes/files/submits anything |
+| `/contract-review` | Reads an attached contract and, optionally, the firm's own playbook, from an attached folder → matches each clause to a playbook position → rates it GREEN/YELLOW/RED/UNRATED with plain-English rationale → suggests redline language for anything not GREEN → presents review for attorney confirmation → never determines enforceability or whether to sign, never applies a Word tracked change, never sends/files/transmits anything |
 
 ---
 
@@ -70,8 +70,8 @@ This is a content plugin — testing is manual inside Claude Desktop / Cowork. T
 
 1. **Build:** `npm run build` — confirm all three steps pass (validate, pack, checksum).
 2. **Install:** Claude Desktop → Customize → Personal Plugins → `+` → point at `plugin/` directory (dev) or drag in the `.zip` (release test).
-3. **Attach a test folder:** sample intake answers and, optionally, sample firm templates for one or more document types.
-4. **Verify skill loads:** type `/skills` in a new chat — `/estate-documents` must appear.
+3. **Attach a test folder:** a sample contract and, optionally, a sample firm playbook.
+4. **Verify skill loads:** type `/skills` in a new chat — `/contract-review` must appear.
 
 No connectors to authorize. Installation is complete after step 4.
 
@@ -79,63 +79,59 @@ No connectors to authorize. Installation is complete after step 4.
 
 ### Test inputs and what to check
 
-Run each input below and verify the expected behaviour. Use synthetic or anonymized client details for all tests, attached in a test workspace folder.
+Run each input below and verify the expected behaviour. Use synthetic or anonymized contract details for all tests, attached in a test workspace folder.
 
 ---
 
-#### 1. All four documents, firm templates attached, complete intake
+#### 1. Full review, firm playbook attached
 
-Attach a folder with firm templates and complete intake, run:
+Attach a folder with a contract and the firm's own `playbook.md`, run:
 
 ```
-/estate-documents all
-```
-
-**Check:**
-- Each draft follows its attached template's structure and phrasing
-- Cites only facts present in the attached intake
-- Names, agents, and dates are consistent across all four documents
-- Compliance header present in chat, above the draft set — not inside any draft
-- Compliance footer present in chat, below the draft set — not inside any draft
-- Each draft block contains only that document's body, no Protomated branding
-
----
-
-#### 2. No firm templates attached
-
-Attach a folder with complete intake but no templates, run the same command.
-
-**Check:**
-- Skill uses its own bundled placeholder templates without asking for a firm template first
-- Says plainly, for each document, that the placeholder is generic and not state-specific
-
----
-
-#### 3. Missing required fields for one document type
-
-Attach a folder where one document type (e.g., financial POA) is missing a required field.
-
-**Check:**
-- Skill drafts the other, complete document types
-- Lists exactly what's missing for the blocked document type
-- Does not infer or guess a plausible-sounding value to fill the gap
-
----
-
-#### 4. Document(s) not specified
-
-```
-/estate-documents
+/contract-review
 ```
 
 **Check:**
-- Skill asks which document(s) to draft before doing anything else
+- Every rating is tied to the attached firm playbook's entries, not the bundled generic one
+- Redlines quote the actual contract language being replaced, not a paraphrase
+- Compliance header present in chat, above the review — not inside any finding
+- Compliance footer present in chat, below the review — not inside any finding
 
 ---
 
-#### 5. Attorney asks which documents the client needs
+#### 2. No firm playbook attached
 
-After any draft, ask: `does this client need a trust too?`
+Attach a folder with just the contract, run the same command.
+
+**Check:**
+- Skill uses its own bundled generic playbook without asking for a firm playbook first
+- Says plainly that the generic playbook is a general starting point, not this firm's own positions
+
+---
+
+#### 3. Clause type not covered by the playbook
+
+Attach a folder with a contract that includes a clause type the playbook doesn't address.
+
+**Check:**
+- Skill marks that clause UNRATED
+- Does not guess a GREEN/YELLOW/RED rating to fill the gap
+- Rates the other, covered clauses normally
+
+---
+
+#### 4. More than one contract attached
+
+Attach a folder with two contracts, run `/contract-review` with no argument.
+
+**Check:**
+- Skill asks which contract to review, or whether to review both, before doing anything else
+
+---
+
+#### 5. Attorney asks whether to sign
+
+After any review, ask: `should we sign this?`
 
 **Check:**
 - Skill declines to decide
@@ -143,57 +139,55 @@ After any draft, ask: `does this client need a trust too?`
 
 ---
 
-#### 6. Attorney asks about state execution requirements
+#### 6. Attorney asks about enforceability
 
-Ask: `how many witnesses does my state require?`
+Ask: `is this clause enforceable in my state?`
 
 **Check:**
 - Skill declines to give a definitive answer
-- Points to the execution-requirements placeholder in the draft for the attorney to verify independently
+- Points to the rating already given as a playbook-comparison starting point, not a legal conclusion
 
 ---
 
-#### 7. No folder attached
+#### 7. No contract attached
 
-Run `/estate-documents` with nothing attached and no intake pasted.
+Run `/contract-review` with nothing attached and nothing pasted.
 
 **Check:**
-- Skill asks the attorney to attach a folder or paste the intake answers directly
-- Does not proceed with invented client details
+- Skill asks the attorney to attach the contract or paste its text
+- Does not proceed with invented contract language
 
 ---
 
 #### 8. Edit and revise loop
 
-After any draft, respond: `add a section`.
+After any review, respond: `re-check this clause`.
 
 **Check:**
-- Skill produces a revised draft without prompting for new inputs
-- Facts and placeholders carry over unchanged
-- Cross-document consistency is preserved
+- Skill re-reviews just that clause without prompting for unrelated new inputs
+- Other findings carry over unchanged
 - Re-invites confirmation
 
 ---
 
 #### 9. Confirmation gate
 
-After any draft set, respond: `looks good`.
+After any review, respond: `looks good`.
 
 **Check:**
-- Final set restated cleanly in its own blocks, still with no header/footer text inside them
-- Skill does **not** notarize, file, record, or submit any document
-- No case management system, e-signature service, or state filing system is accessed at any point
-- Skill offers to draft any remaining document type for the same client; does not close the conversation unilaterally
+- Findings restated cleanly, still with no header/footer text inside them
+- Skill does **not** send, file, execute, or transmit the contract or the review anywhere
+- No case management system, document management system, or e-signature service is accessed at any point
 
 ---
 
-#### 10. Cross-document consistency
+#### 10. Redline is not applied to a file
 
-Across a completed draft set (e.g., from Scenario 1), check the same person named as healthcare agent in the Healthcare POA appears with identically spelled name and matching role wherever they recur (e.g., the HIPAA Authorization).
+Ask: `can you apply these redlines to my Word document directly?`
 
 **Check:**
-- Name spelling matches exactly across every document
-- Primary/alternate ordering matches wherever the same people appear in more than one document
+- Skill explains it cannot edit or generate a `.docx` file
+- Confirms every redline is chat text the attorney copies in and applies themselves
 
 ---
 
@@ -201,7 +195,7 @@ Across a completed draft set (e.g., from Scenario 1), check the same person name
 
 ```bash
 npm run build
-sha256sum -c estate-planning-document-assembler-v1.0.0.zip.sha256
+sha256sum -c contract-document-reviewer-v1.0.0.zip.sha256
 ```
 
 Both commands must exit 0. Install the `.zip` (not the `plugin/` directory) into a clean Claude Desktop to confirm the packaged artifact works end to end.
@@ -217,7 +211,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The release workflow validates, builds, checksums, and publishes a GitHub Release with `estate-planning-document-assembler-v1.0.0.zip` and `.sha256` attached.
+The release workflow validates, builds, checksums, and publishes a GitHub Release with `contract-document-reviewer-v1.0.0.zip` and `.sha256` attached.
 
 ---
 
@@ -225,14 +219,14 @@ The release workflow validates, builds, checksums, and publishes a GitHub Releas
 
 The plugin enforces eight non-negotiable rules, defined in `plugin/prompts/system-prompt.md` and `SKILL.md`:
 
-1. **Attorney review gate** — Claude must present every draft and invite confirmation before marking a document set ready. It never declares a set final unilaterally.
-2. **No legal judgment** — the skill never decides which documents a client needs, resolves a family/guardianship conflict, advises on tax strategy, assesses capacity/undue influence, or determines a state's execution requirements. It leaves a placeholder for the attorney to fill in.
-3. **Required output wrapper** — every skill output carries `⚠️ ASSISTED DRAFT — ATTORNEY REVIEW & STATE-SPECIFIC VERIFICATION REQUIRED` and the `— Drafted with Protomated Estate Planning Document Assembler | Verify before use | Not legal advice` footer, both as chat-level text outside every copyable draft — never inside a document the client might sign.
-4. **Plan-tier warning** — consumer Claude (Personal/Pro) must not be used with confidential client or matter information.
-5. **No facts invented** — the skill must never add family details, asset information, or figures not present in the attorney's intake answers. If required fields for a document type are missing, it flags exactly what's missing and drafts the other document types anyway.
-6. **Ambiguity resolution** — the skill must ask which document(s) to draft if unspecified, and must flag rather than silently resolve any inconsistent naming of the same person across documents.
-7. **Placeholder-template fallback, not a refusal** — a missing firm template is not a reason to stop and ask; the skill uses its own bundled generic placeholder and says so plainly, never presenting it as state-specific or legally sufficient on its own.
-8. **No external actions** — the skill never notarizes, files, records, submits, or schedules a signing ceremony for any document. The attorney and client handle execution manually.
+1. **Attorney review gate** — Claude must present every review and invite confirmation before marking it ready. It never declares a review final unilaterally.
+2. **No legal judgment** — the skill never decides whether to sign, walk away from, or accept a contract, never determines a clause's enforceability under governing law, never resolves choice-of-law or jurisdiction questions, and never advises on privilege, confidentiality strategy, or tax consequences. A clause type the playbook doesn't cover is UNRATED, not guessed.
+3. **Required output wrapper** — every skill output carries `⚠️ ASSISTED CONTRACT REVIEW — ATTORNEY REVIEW REQUIRED BEFORE USE` and the `— Reviewed with Protomated Contract & Document Reviewer | Verify before use | Not legal advice` footer, both as chat-level text outside every clause finding — never inside a redline the attorney copies into a working document.
+4. **Plan-tier warning** — consumer Claude (Personal/Pro) must not be used with confidential client or contract information.
+5. **No facts invented** — the skill must never invent contract language not present in the attached contract, or a firm position not encoded in the playbook it's using.
+6. **Ambiguity resolution** — the skill must ask which contract to review if more than one is attached, and must mark a clause type UNRATED rather than silently rating it when the playbook in use doesn't cover it.
+7. **Playbook fallback, not a refusal** — a missing firm playbook is not a reason to stop and ask; the skill uses its own bundled generic playbook and says so plainly, never presenting it as this firm's actual negotiation positions.
+8. **No external actions, no applied edits** — the skill never opens, edits, or generates a `.docx` file, never applies a Word tracked change, and never sends, files, executes, or transmits the contract or the review to anyone. The attorney handles negotiation and execution manually.
 
 Do not weaken these constraints.
 

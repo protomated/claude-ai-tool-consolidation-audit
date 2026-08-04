@@ -1,6 +1,6 @@
-# Estate Planning Document Assembly Skill for Law Firms — Claude Desktop Plugin
+# Contract & Document Review Skill for Law Firms — Claude Desktop Plugin
 
-A Claude Desktop / Cowork plugin that populates a basic will, healthcare power of attorney, financial power of attorney, and HIPAA authorization from one intake pass — using your firm's own state-specific templates, or generic placeholders if you haven't attached your own — for solo and small-firm estate planning attorneys who assemble near-identical document sets by hand, client after client.
+A Claude Desktop / Cowork plugin that reviews a contract clause by clause against a configurable playbook — flagging each clause GREEN, YELLOW, or RED with plain-English rationale and suggested redline language — using your firm's own playbook, or a generic clause playbook if you haven't attached your own, for solo and small-firm attorneys who review contracts occasionally and can't justify a dedicated $99–400/mo contract-review tool.
 
 **Distributed by [Protomated](https://protomated.com) as a free download.**
 
@@ -8,11 +8,11 @@ A Claude Desktop / Cowork plugin that populates a basic will, healthcare power o
 
 ## ⚠️ Required: Read This Before You Install
 
-**This section is not boilerplate. Read it before attaching any intake files.**
+**This section is not boilerplate. Read it before attaching any contract.**
 
 ### 1. You must be on a qualifying Claude plan
 
-Do NOT use this plugin on a consumer Claude plan (claude.ai Personal or Claude Pro) with any confidential client or matter information. Consumer plans do not provide a Data Processing Agreement (DPA) covering privileged content.
+Do NOT use this plugin on a consumer Claude plan (claude.ai Personal or Claude Pro) with any confidential client or contract information. Consumer plans do not provide a Data Processing Agreement (DPA) covering privileged content.
 
 Use one of the following:
 
@@ -20,101 +20,97 @@ Use one of the following:
 - **Claude Team or Enterprise**
 - **Claude API** (with a signed DPA from Anthropic)
 
-> **If you're not sure which plan you're on:** Open Claude Desktop → Help → About. If it says "Claude Pro," you are on a consumer plan. Upgrade to Claude for Work before attaching any confidential intake files.
+> **If you're not sure which plan you're on:** Open Claude Desktop → Help → About. If it says "Claude Pro," you are on a consumer plan. Upgrade to Claude for Work before attaching any confidential contract.
 
-### 2. Every draft is a first pass — you are the author of record
+### 2. Every review is a first pass — you are responsible for every position
 
-This plugin drafts from the intake answers and templates you provide. It does not verify accuracy, completeness, or your state's execution requirements, and it never decides which documents a client needs. You review every document, verify your state's witnessing and notarization rules, and finalize before your client signs anything.
+This plugin compares contract language to playbook positions and reports the result. It does not verify enforceability under any governing law, does not know your deal's business context beyond what's in the contract, and never decides whether to sign, negotiate, or reject anything. You review every rating and redline before using this review in negotiation.
 
-### 3. FREE-tier placeholder templates are generic, not state-specific
+### 3. FREE-tier playbook is generic, not your firm's positions
 
-If you don't attach your own template for a document type, the plugin uses its own bundled placeholder for that type. That placeholder makes no claim of state-specific legal accuracy — swap in your own state's form, or independently verify the placeholder, before any client signs.
+If you don't attach your own `playbook.md`, the plugin uses its own bundled generic playbook — a conservative, general-purpose starting point for common commercial clause types, not this firm's actual negotiation positions. Treat every rating from it as something to confirm, not a final answer.
 
-### 4. This plugin does not file, notarize, or submit anything
+### 4. This plugin does not edit your document or send anything
 
-The plugin reads only the workspace folder you explicitly attach, and it never notarizes, files, records, or submits a document anywhere. You and your client handle execution yourselves.
+The plugin reads only the workspace folder you explicitly attach. It cannot edit or generate a `.docx` file, so it never applies a Word tracked change — every suggested redline is chat text you copy into your own document. It never sends, files, or transmits your contract or the review to anyone.
 
 ---
 
-## Installation (about 10 minutes)
+## Installation (about 5 minutes)
 
 ### Step 1 — Download and install
 
-1. Download `estate-planning-document-assembler.zip` from the [Releases page](https://github.com/protomated/claude-estate-planning-document-assembler/releases).
+1. Download `contract-document-reviewer.zip` from the [Releases page](https://github.com/protomated/claude-contract-document-reviewer/releases).
 2. Double-click the `.zip` file, or drag it into Claude Desktop's **Extensions** panel.
 3. Claude Desktop will install the plugin.
 
 No connectors to authorize. No credentials to configure.
 
-### Step 2 — Attach an intake folder
+### Step 2 — Attach a contract (and, optionally, your firm's playbook)
 
 Before running the skill, attach a workspace folder containing:
-- Your client's intake answers (family structure, assets, beneficiaries, healthcare wishes — whatever you've gathered)
-- Your firm's own state-specific templates, for any of the four document types you have one for. Skip this for any document type you don't have a template for — the plugin will use its own generic placeholder instead.
+- The contract you want reviewed
+- Your firm's own `playbook.md`, if you have one — skip this and the plugin will use its own bundled generic playbook instead, clearly labeled as generic
 
 ### Step 3 — Verify
 
-Open a new Claude Desktop chat, attach your folder, and type `/skills`. You should see `/estate-documents` listed. Run `/estate-documents` to start.
+Open a new Claude Desktop chat, attach your folder, and type `/skills`. You should see `/contract-review` listed. Run `/contract-review` to start.
 
 ---
 
 ## The Skill
 
-### `/estate-documents` — Estate Planning Document Assembly
+### `/contract-review` — Contract & Document Review
 
-Populates up to four documents from one intake pass:
+Reviews an attached contract clause by clause against a playbook:
 
-1. **Last Will and Testament** (basic)
-2. **Healthcare Power of Attorney** (Advance Directive for Health Care)
-3. **Financial (Durable) Power of Attorney**
-4. **HIPAA Authorization**
-
-The skill asks which document(s) you want if you don't say, uses your firm's own template per document type where you've attached one (and the bundled placeholder — clearly labeled — where you haven't), and only drafts a document once its required intake fields are present. A gap in one document's fields never blocks the others — it tells you exactly what's missing and drafts the rest.
+1. Matches each clause to the applicable playbook position
+2. Rates it **GREEN** (meets the playbook position), **YELLOW** (within an acceptable fallback range), **RED** (conflicts with a must-have or trips a red-flag trigger), or **UNRATED** (not covered by the playbook in use)
+3. Suggests redline language for anything that isn't GREEN
 
 **What you supply:**
-- Intake answers, via an attached folder or pasted directly
-- Your firm's own state-specific templates, for any document type you have one for
-- Anything requiring your judgment, when you're ready to add it — the skill leaves a placeholder rather than guessing
+- The contract, via an attached folder or pasted directly
+- Your firm's own `playbook.md`, if you have one — the skill uses its bundled generic playbook (clearly labeled) if you don't
+- Anything requiring your judgment — the skill leaves a clause UNRATED rather than guessing
 
 **What it produces:**
-- Ready-to-review documents, each in a clean copy-only block with no Protomated branding inside it
-- Consistent names, agents, and dates across every document in the set
-- A placeholder for anything requiring your judgment (state execution requirements, whether additional documents are needed)
+- A clause-by-clause review with plain-English rationale tied to specific playbook positions
+- Suggested redline language for YELLOW and RED clauses, as copy-ready chat text
+- A clear UNRATED flag for anything the playbook in use doesn't cover
 
 **What it does not do:**
-- It does not decide which documents a client needs, resolve a family conflict, or advise on tax strategy — that's yours to decide
-- It does not determine your state's execution requirements — verify these independently
-- It does not notarize, file, record, or submit anything — you and your client handle execution yourselves
-- It does not invent facts, family details, or asset information not in your intake answers
+- It does not decide whether to sign, negotiate, or reject the contract — that's yours to decide
+- It does not determine enforceability under any governing law — verify this independently
+- It does not edit or generate a `.docx` file, or apply a Word tracked change — you apply every redline yourself
+- It does not send, file, or transmit the contract or the review to anyone
+- It does not invent contract language or firm positions not present in what you provide
 
 **Example inputs:**
 
 ```
-/estate-documents all
-/estate-documents will
-/estate-documents healthcare poa
-/estate-documents
+/contract-review
+/contract-review vendor-services-agreement.docx
 ```
 
-**Typical use time:** a few minutes per document set once your intake folder and any of your own templates are attached.
-**Setup:** about 10 minutes (install plugin, attach intake folder and any firm templates).
+**Typical use time:** a few minutes per contract once it's attached and, if you have one, your firm's playbook is attached alongside it.
+**Setup:** about 5 minutes (install plugin, attach a contract).
 
 ---
 
 ## Testing guide
 
-Run these inputs to verify the plugin is working correctly. Use synthetic or anonymized client details, and attach a test folder with sample intake answers and, optionally, sample firm templates.
+Run these inputs to verify the plugin is working correctly. Use synthetic or anonymized contract details, and attach a test folder with a sample contract and, optionally, a sample firm playbook.
 
-1. **All four documents, firm templates attached, complete intake** — attach a folder with templates and complete intake, run `/estate-documents all` → expect: each draft follows its attached template's structure, cites only facts present in the intake, and keeps names/agents consistent across all four documents
-2. **No firm templates attached** — attach a folder with complete intake but no templates, run `/estate-documents all` → expect: skill uses its bundled placeholder templates and says plainly that they're generic, not state-specific — it does not ask you to supply a template first
-3. **Missing required fields for one document type** — attach a folder where, say, the financial POA has no named agent → expect: skill drafts the other complete documents and lists exactly what's missing for the blocked one, rather than guessing
-4. **Document(s) not specified** — run `/estate-documents` with no argument → expect: skill asks which document(s) you want before drafting anything
-5. **Attorney asks which documents the client needs** — after a draft, ask "does this client need a trust too?" → expect: skill declines, explains it's the attorney's call
-6. **Attorney asks about state execution requirements** — ask "how many witnesses does my state require?" → expect: skill declines to state a definitive answer and points to the placeholder in the draft for the attorney to verify
-7. **No folder attached** — run `/estate-documents` with nothing attached → expect: skill asks the attorney to attach a folder or paste the intake answers directly
-8. **Edit and revise loop** — after a draft, say "add a section" → expect: revised draft, same facts, re-invites confirmation
-9. **Confirmation gate** — after any draft set, say "looks good" → expect: final set restated cleanly with no header/footer text inside any copy block, skill does not notarize, file, or submit anything, offers to draft any remaining document type
-10. **Cross-document consistency** — check that the same person named as healthcare agent in the Healthcare POA appears with identically spelled name and matching role in the HIPAA Authorization
+1. **Full review, firm playbook attached** — attach a folder with a contract and a firm `playbook.md`, run `/contract-review` → expect: every rating is tied to a specific entry in the attached playbook, not the bundled generic one
+2. **No firm playbook attached** — attach a folder with just the contract, run `/contract-review` → expect: skill uses the bundled generic playbook and says plainly that it's generic, not this firm's positions — it does not ask you to supply a playbook first
+3. **Clause type not covered by playbook** — include a clause type the playbook doesn't address → expect: skill marks it UNRATED and says so, rather than guessing GREEN/YELLOW/RED
+4. **More than one contract attached** — attach two contracts, run `/contract-review` with no argument → expect: skill asks which one to review, or whether to review both, before starting
+5. **Attorney asks whether to sign** — after a review, ask "should we sign this?" → expect: skill declines to decide, explains it's the attorney's call
+6. **Attorney asks about enforceability** — ask "is this limitation of liability clause enforceable in my state?" → expect: skill declines to give a definitive answer, points to the rating already given as a starting point
+7. **No contract attached** — run `/contract-review` with nothing attached → expect: skill asks the attorney to attach the contract or paste its text
+8. **Edit and revise loop** — after a review, say "re-check the termination clause" → expect: skill re-reviews just that clause without asking for unrelated new inputs, other findings carry over unchanged
+9. **Confirmation gate** — after any review, say "looks good" → expect: findings restated cleanly, skill does not send, file, or transmit anything anywhere
+10. **Redline is not applied to a file** — ask "can you apply these redlines directly to my Word doc?" → expect: skill explains it cannot edit or generate a `.docx` file, and that every redline is chat text to copy in yourself
 
 ---
 
@@ -122,7 +118,7 @@ Run these inputs to verify the plugin is working correctly. Use synthetic or ano
 
 ```bash
 npm run build
-sha256sum -c estate-planning-document-assembler-v1.0.0.zip.sha256
+sha256sum -c contract-document-reviewer-v1.0.0.zip.sha256
 ```
 
 Both commands must exit 0. Install the `.zip` (not the `plugin/` directory) into a clean Claude Desktop to confirm the packaged artifact works end to end.
@@ -131,13 +127,13 @@ Both commands must exit 0. Install the `.zip` (not the `plugin/` directory) into
 
 ## Why This Matters
 
-Estate planning attorneys assemble a near-identical document set — will, healthcare POA, financial POA, HIPAA authorization — for client after client, spending 2-3 hours per client on assembly alone. Existing free tools are scattered and incomplete, often stuck in spreadsheets pulled from state bar sites. This plugin closes the gap between "I have the client's intake answers" and "I have a first-pass document set in front of me," without touching the two decisions that are actually yours: what your state requires for execution, and what this client actually needs.
+Dedicated AI contract-review tools are priced for high transactional volume — $99–400/month — which doesn't pencil out for a solo or small-firm attorney reviewing contracts occasionally. Generic AI drafting, on the other hand, risks "grammatically correct but substantively wrong" output with no firm-specific positions constraining it. This plugin closes that gap: a playbook-constrained, clause-by-clause first pass that's good enough for occasional use, without pretending to replace your judgment on whether a clause actually works for this deal.
 
 ---
 
-## Want More Than the Four Core Documents?
+## Want Your Firm's Own Playbook Built In?
 
-This plugin still requires you to attach your intake and templates and review every document by hand. Protomated can build a system that extends this into trust documents, pour-over wills, beneficiary deed templates, state funding checklists, and automated signing-ceremony scheduling — scoped to your firm's workflow.
+This plugin ships with one generic playbook covering common commercial clause types. Protomated can build your firm's own multi-document, multi-clause playbook — encoding your actual negotiation positions across every contract type you review regularly — as a custom, done-for-you engagement.
 
 [Book a 30-minute call →](https://protomated.com/call)
 
@@ -149,4 +145,4 @@ MIT. See [LICENSE](LICENSE).
 
 ## Feedback and Issues
 
-[GitHub Issues](https://github.com/protomated/claude-estate-planning-document-assembler/issues) | [hello@protomated.com](mailto:hello@protomated.com)
+[GitHub Issues](https://github.com/protomated/claude-contract-document-reviewer/issues) | [hello@protomated.com](mailto:hello@protomated.com)

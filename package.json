@@ -1,7 +1,7 @@
 {
-  "name": "estate-planning-document-assembler",
+  "name": "contract-document-reviewer",
   "version": "1.0.0",
-  "description": "Estate Planning Document Assembler — Claude Desktop plugin that populates a basic will, healthcare power of attorney, financial power of attorney, and HIPAA authorization from one intake pass for solo and small-firm estate planning attorneys",
+  "description": "Contract & Document Reviewer — Claude Desktop plugin that reviews a contract clause by clause against a configurable playbook, flagging each clause GREEN/YELLOW/RED with suggested redline language, for solo and small-firm attorneys",
   "private": true,
   "scripts": {
     "validate": "node scripts/validate-plugin.mjs plugin",
