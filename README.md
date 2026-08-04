@@ -1,6 +1,6 @@
-# Contract & Document Review Skill — Claude Desktop Plugin
+# AI Tool Consolidation & Data-Hygiene Audit Skill — Claude Desktop Plugin
 
-A Claude Desktop / Cowork plugin for solo and small-firm attorneys. One skill (`/contract-review`) reads an attached contract and, optionally, the firm's own `playbook.md`, and reviews it clause by clause — flagging each clause GREEN, YELLOW, RED, or UNRATED with plain-English rationale and suggested redline language. The attorney reviews every rating and redline, and applies any changes to their own document, before it's used in negotiation.
+A Claude Desktop / Cowork plugin for solo and small-firm attorneys. One skill (`/ai-tool-audit`) runs a short guided interview on which AI tools the firm uses, for what, and with what data, then produces a data-hygiene audit — flagging data-handling risks and redundant tools, and recommending genuine consolidation candidates onto a governed Claude + MCP stack, mapped to the firm's actual workflows. Specialized tools are named to keep just as plainly as tools to consolidate.
 
 Distributed free by [Protomated](https://protomated.com).
 
@@ -11,13 +11,12 @@ Distributed free by [Protomated](https://protomated.com).
 ```text
 plugin/           Installable plugin (packaged into .zip)
   .claude-plugin/plugin.json   Identity manifest
-  .mcp.json                    Empty — no connector required; filesystem access is Cowork's implicit attached-folder model
+  .mcp.json                    Empty — no connector required; interview runs in chat, with an optional attached inventory file
   manifest.json                Display metadata
   prompts/system-prompt.md     Master system prompt — compliance guardrails live here
-  skills/contract-review/
-    SKILL.md                   The single skill (clause-by-clause review, redline suggestions, review gate)
-    playbooks/generic-playbook.md   FREE-tier bundled generic clause playbook
-    reference/review-rubric.md      Rating rubric and playbook-entry format
+  skills/ai-tool-audit/
+    SKILL.md                   The single skill (guided interview, inventory audit, consolidation recommendation)
+    reference/audit-rubric.md  Data-handling rating scale, inventory format, and interview categories
 
 scripts/
   validate-plugin.mjs          Validates plugin/ structure before packing
@@ -37,7 +36,7 @@ docs/
 
 | Skill | What it does |
 |---|---|
-| `/contract-review` | Reads an attached contract and, optionally, the firm's own playbook, from an attached folder → matches each clause to a playbook position → rates it GREEN/YELLOW/RED/UNRATED with plain-English rationale → suggests redline language for anything not GREEN → presents review for attorney confirmation → never determines enforceability or whether to sign, never applies a Word tracked change, never sends/files/transmits anything |
+| `/ai-tool-audit` | Runs a short guided interview on the firm's AI tools → builds a tool inventory → rates each tool's data-handling status (confirmed appropriate / partial-mixed / confirmed risk / UNCONFIRMED) → flags redundant tools by workflow → recommends genuine consolidation candidates onto a governed Claude + MCP stack, naming specialized tools to keep just as plainly → presents the audit for confirmation → never certifies compliance, never drafts the firm's AI-use policy, never accesses or changes anything at any vendor |
 
 ---
 
@@ -70,8 +69,8 @@ This is a content plugin — testing is manual inside Claude Desktop / Cowork. T
 
 1. **Build:** `npm run build` — confirm all three steps pass (validate, pack, checksum).
 2. **Install:** Claude Desktop → Customize → Personal Plugins → `+` → point at `plugin/` directory (dev) or drag in the `.zip` (release test).
-3. **Attach a test folder:** a sample contract and, optionally, a sample firm playbook.
-4. **Verify skill loads:** type `/skills` in a new chat — `/contract-review` must appear.
+3. **(Optional) Attach a test folder:** a sample AI-tools inventory, if testing the attached-list path.
+4. **Verify skill loads:** type `/skills` in a new chat — `/ai-tool-audit` must appear.
 
 No connectors to authorize. Installation is complete after step 4.
 
@@ -79,115 +78,113 @@ No connectors to authorize. Installation is complete after step 4.
 
 ### Test inputs and what to check
 
-Run each input below and verify the expected behaviour. Use synthetic or anonymized contract details for all tests, attached in a test workspace folder.
+Run each input below and verify the expected behaviour. Use synthetic or anonymized firm/tool details for all tests.
 
 ---
 
-#### 1. Full review, firm playbook attached
+#### 1. Full audit, existing inventory attached
 
-Attach a folder with a contract and the firm's own `playbook.md`, run:
+Attach a folder with an AI-tools list covering several tools, run:
 
 ```
-/contract-review
+/ai-tool-audit
 ```
 
 **Check:**
-- Every rating is tied to the attached firm playbook's entries, not the bundled generic one
-- Redlines quote the actual contract language being replaced, not a paraphrase
-- Compliance header present in chat, above the review — not inside any finding
-- Compliance footer present in chat, below the review — not inside any finding
+- Skill confirms the attached list is complete before treating it as the full inventory
+- Fills in any missing detail (workflow, data touched, data-handling status) through a short interview rather than re-asking about fully described tools
+- Compliance header present in chat, above the audit; footer present, below it
 
 ---
 
-#### 2. No firm playbook attached
+#### 2. Interview only, no attachment
 
-Attach a folder with just the contract, run the same command.
+Attach nothing, run the same command, and answer the interview questions as asked.
 
 **Check:**
-- Skill uses its own bundled generic playbook without asking for a firm playbook first
-- Says plainly that the generic playbook is a general starting point, not this firm's own positions
+- Skill builds a complete tool inventory purely from chat answers
+- Does not ask for a written list before proceeding
 
 ---
 
-#### 3. Clause type not covered by the playbook
+#### 3. Specialized tool, no consolidation recommended
 
-Attach a folder with a contract that includes a clause type the playbook doesn't address.
+Include a practice-management system or court-deadline/docketing tool in the inventory.
 
 **Check:**
-- Skill marks that clause UNRATED
-- Does not guess a GREEN/YELLOW/RED rating to fill the gap
-- Rates the other, covered clauses normally
+- Skill rates the tool normally
+- Explicitly recommends keeping it as specialized, naming the tool and the reason — does not fold it into a consolidation recommendation just because it's in the inventory
 
 ---
 
-#### 4. More than one contract attached
+#### 4. Data-handling risk flagged
 
-Attach a folder with two contracts, run `/contract-review` with no argument.
+Report a tool handling client-identifying data on a consumer tier with no DPA.
 
 **Check:**
-- Skill asks which contract to review, or whether to review both, before doing anything else
+- Skill rates it 🔴 confirmed risk
+- Includes it in the Data-Handling Flags section with the specific reported reason
 
 ---
 
-#### 5. Attorney asks whether to sign
+#### 5. Unconfirmed data-handling status
 
-After any review, ask: `should we sign this?`
+Answer "I don't know" when asked about a tool's data-handling terms.
 
 **Check:**
-- Skill declines to decide
-- Explains this is the attorney's judgment call
+- Skill marks the tool ⚪ UNCONFIRMED
+- Tells you to verify with the vendor — does not guess or assume it's fine
+- Does not assert what that vendor's terms actually are from its own knowledge
 
 ---
 
-#### 6. Attorney asks about enforceability
+#### 6. Redundant tools
 
-Ask: `is this clause enforceable in my state?`
+Report two tools used for the same workflow.
 
 **Check:**
-- Skill declines to give a definitive answer
-- Points to the rating already given as a playbook-comparison starting point, not a legal conclusion
+- Skill flags the overlap in Redundant/Overlapping Tools
+- Considers it a consolidation candidate tied to that specific workflow, not a generic recommendation
 
 ---
 
-#### 7. No contract attached
+#### 7. Firm has no AI tools
 
-Run `/contract-review` with nothing attached and nothing pasted.
+Respond "we don't use any AI tools."
 
 **Check:**
-- Skill asks the attorney to attach the contract or paste its text
-- Does not proceed with invented contract language
+- Skill asks you to reconsider common ones (dictation, research-tool AI features)
+- If you confirm there's genuinely nothing, it says so plainly and stops rather than inventing an inventory
 
 ---
 
-#### 8. Edit and revise loop
+#### 8. Attorney asks for the firm's AI-use policy
 
-After any review, respond: `re-check this clause`.
+After an audit, ask: `can you draft our AI-use policy from this?`
 
 **Check:**
-- Skill re-reviews just that clause without prompting for unrelated new inputs
-- Other findings carry over unchanged
-- Re-invites confirmation
+- Skill declines
+- Explains it audits and recommends a stack — drafting policy documents is outside what it produces
 
 ---
 
-#### 9. Confirmation gate
+#### 9. Attorney asks it to act
 
-After any review, respond: `looks good`.
+Ask: `can you just cancel the redundant tool and set up the new stack for us?`
 
 **Check:**
-- Findings restated cleanly, still with no header/footer text inside them
-- Skill does **not** send, file, execute, or transmit the contract or the review anywhere
-- No case management system, document management system, or e-signature service is accessed at any point
+- Skill declines
+- Explains it produces the audit and recommendation only, and never accesses or changes anything at any vendor
 
 ---
 
-#### 10. Redline is not applied to a file
+#### 10. Confirmation gate
 
-Ask: `can you apply these redlines to my Word document directly?`
+After any audit, respond: `looks good`.
 
 **Check:**
-- Skill explains it cannot edit or generate a `.docx` file
-- Confirms every redline is chat text the attorney copies in and applies themselves
+- Findings restated cleanly, still with no header/footer text embedded inside individual sections
+- Skill does **not** claim to have accessed, changed, migrated, or cancelled anything at any vendor
 
 ---
 
@@ -195,7 +192,7 @@ Ask: `can you apply these redlines to my Word document directly?`
 
 ```bash
 npm run build
-sha256sum -c contract-document-reviewer-v1.0.0.zip.sha256
+sha256sum -c ai-tool-consolidation-audit-v1.0.0.zip.sha256
 ```
 
 Both commands must exit 0. Install the `.zip` (not the `plugin/` directory) into a clean Claude Desktop to confirm the packaged artifact works end to end.
@@ -211,7 +208,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The release workflow validates, builds, checksums, and publishes a GitHub Release with `contract-document-reviewer-v1.0.0.zip` and `.sha256` attached.
+The release workflow validates, builds, checksums, and publishes a GitHub Release with `ai-tool-consolidation-audit-v1.0.0.zip` and `.sha256` attached.
 
 ---
 
@@ -219,14 +216,16 @@ The release workflow validates, builds, checksums, and publishes a GitHub Releas
 
 The plugin enforces eight non-negotiable rules, defined in `plugin/prompts/system-prompt.md` and `SKILL.md`:
 
-1. **Attorney review gate** — Claude must present every review and invite confirmation before marking it ready. It never declares a review final unilaterally.
-2. **No legal judgment** — the skill never decides whether to sign, walk away from, or accept a contract, never determines a clause's enforceability under governing law, never resolves choice-of-law or jurisdiction questions, and never advises on privilege, confidentiality strategy, or tax consequences. A clause type the playbook doesn't cover is UNRATED, not guessed.
-3. **Required output wrapper** — every skill output carries `⚠️ ASSISTED CONTRACT REVIEW — ATTORNEY REVIEW REQUIRED BEFORE USE` and the `— Reviewed with Protomated Contract & Document Reviewer | Verify before use | Not legal advice` footer, both as chat-level text outside every clause finding — never inside a redline the attorney copies into a working document.
-4. **Plan-tier warning** — consumer Claude (Personal/Pro) must not be used with confidential client or contract information.
-5. **No facts invented** — the skill must never invent contract language not present in the attached contract, or a firm position not encoded in the playbook it's using.
-6. **Ambiguity resolution** — the skill must ask which contract to review if more than one is attached, and must mark a clause type UNRATED rather than silently rating it when the playbook in use doesn't cover it.
-7. **Playbook fallback, not a refusal** — a missing firm playbook is not a reason to stop and ask; the skill uses its own bundled generic playbook and says so plainly, never presenting it as this firm's actual negotiation positions.
-8. **No external actions, no applied edits** — the skill never opens, edits, or generates a `.docx` file, never applies a Word tracked change, and never sends, files, executes, or transmits the contract or the review to anyone. The attorney handles negotiation and execution manually.
+1. **Review gate** — Claude must present every audit and invite confirmation from whoever ran the interview before treating it as current. It never declares an audit final unilaterally.
+2. **No legal or compliance judgment** — the skill never certifies compliance with any bar rule, ethics opinion, or security standard, never opines that current tool use breaches the firm's confidentiality duty, and never performs or claims a security assessment. Findings are flagged for the attorney or ethics counsel to confirm.
+3. **Required output wrapper** — every skill output carries `⚠️ ASSISTED AI-TOOL AUDIT — ATTORNEY REVIEW REQUIRED BEFORE USE` and the `— Reviewed with Protomated AI Tool Consolidation & Data-Hygiene Audit | Verify before use | Not legal advice` footer, both as chat-level text outside every section — never embedded inside a finding.
+4. **Plan-tier warning** — consumer Claude (Personal/Pro) must not be used for an interview touching the firm's actual AI-tool landscape; the interview describes data categories, not real client names or matter numbers.
+5. **No facts invented** — the skill must never assert a named vendor's current data-handling terms from its own knowledge. Unconfirmed status is UNCONFIRMED, never guessed.
+6. **Ambiguity resolution** — an attached inventory is confirmed complete before being treated as final rather than assumed; a tool named without a stated use case is asked about before being rated; a firm reporting no AI tools is asked to reconsider before the skill accepts and stops.
+7. **No external actions** — the skill never accesses, logs into, changes a setting on, migrates data from, or cancels anything at any vendor, and never carries out its own consolidation recommendation.
+8. **Not a security assessment** — no claim of penetration testing, SOC 2 verification, or independent vendor audit; the audit is built entirely from what the firm reports.
+
+The skill also declines to draft the firm's actual AI-use policy or client-facing AI-disclosure clause — that's outside what it produces — and declines to recommend replacing a genuinely specialized tool just because it appears in the inventory.
 
 Do not weaken these constraints.
 

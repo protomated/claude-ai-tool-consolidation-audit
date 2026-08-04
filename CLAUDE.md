@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-**PAC-18 (CP6)** — Contract & Document Review Skill (Firm Playbook). A Claude Desktop / Cowork plugin for solo and small-firm attorneys. One skill (`/contract-review`) reads a contract the attorney attaches, plus, optionally, the firm's own configurable `playbook.md`, and reviews it clause by clause — flagging each clause GREEN, YELLOW, RED, or UNRATED with plain-English rationale and suggested redline language. The attorney reviews every rating and redline, applies any changes to their own document, and confirms before the review is used in negotiation. There is no runtime code, no MCP server, no connector, and no backend. The product is entirely content: a markdown skill file, a bundled generic playbook, a rating-rubric reference doc, and JSON manifests.
+**CP18** — AI Tool Consolidation & Data-Hygiene Audit Skill. A Claude Desktop / Cowork plugin for solo and small-firm attorneys. One skill (`/ai-tool-audit`) runs a short guided interview on which AI tools the firm uses, for what, and with what data, then produces a data-hygiene audit — flagging data-handling risks and redundant tools, and recommending genuine consolidation candidates onto a governed Claude + MCP stack, mapped to the firm's actual workflows. Specialized tools (practice management, docketing/deadline engines, e-discovery, e-signature) are named to keep just as plainly as tools recommended for consolidation — the skill never pitches a blanket "replace everything with Claude." The attorney (or whoever ran the interview) reviews and confirms the audit before treating it as the firm's current inventory. There is no runtime code, no MCP server, no connector, and no backend. The product is entirely content: a markdown skill file, a rating-rubric reference doc, and JSON manifests.
 
-Cross-ref: net-new. The n8n catalog's cut list explicitly excluded "AI clause review/contract risk flagging" as legal analysis reserved for humans. This catalog's governance update (see PAC-61) puts it back in scope for Claude plugins specifically, because Claude reasons and drafts with a human always reviewing before anything is sent, unlike an autonomous n8n workflow.
+The leak it plugs: firms are accumulating an average of about 18 different AI tools with inconsistent data policies and no single source of truth — a firm rarely has one place that says what it's using, what data touches what, and what's simply duplicated effort. Nothing dedicated addresses this; it's an original angle, not a shrink of an existing tool category. It also positions the wider plugin catalog as "one governed AI system" rather than one more point tool added to the pile — pairs conceptually with the AI Use Policy & Client-Disclosure Generator (CP3) skill in outreach, even though the two ship as separate plugins: this skill audits and recommends a stack, CP3 drafts the actual policy and disclosure clause. If asked to draft a policy itself, this skill declines and states that's outside what it produces — it does not name CP3 by name at runtime, since this skill must not imply a specific sibling product is published and available before it actually is.
 
-Landing page: `protomated.com/templates/contract-document-reviewer/` (WordPress — managed outside this repo).
+Landing page: `protomated.com/templates/ai-tool-consolidation-audit/` (WordPress — managed outside this repo).
 
 ## Repo layout
 
@@ -18,10 +18,9 @@ plugin/           The installable plugin (packaged into .zip bundle)
   .mcp.json                    Empty — filesystem access is Cowork's implicit attached-folder model, not a connector
   manifest.json                Plugin display metadata
   prompts/system-prompt.md     Master system prompt — compliance guardrails live here
-  skills/contract-review/
+  skills/ai-tool-audit/
     SKILL.md                   The single skill; YAML frontmatter + markdown body
-    playbooks/generic-playbook.md   FREE-tier bundled generic clause playbook
-    reference/review-rubric.md      GREEN/YELLOW/RED/UNRATED rating rubric and playbook-entry format
+    reference/audit-rubric.md  Data-handling rating scale, inventory row format, and interview categories
 scripts/
   validate-plugin.mjs          Validates plugin/ structure before packing
 docs/
@@ -54,7 +53,7 @@ npm run tree
 
 ## Plugin format
 
-The bundle format is `.zip`. It uses the **plugin variant** (not standalone) — no bundled MCP server, no connectors. Plugin name: `contract-document-reviewer`, current version: `1.0.0`.
+The bundle format is `.zip`. It uses the **plugin variant** (not standalone) — no bundled MCP server, no connectors. Plugin name: `ai-tool-consolidation-audit`, current version: `1.0.0`.
 
 Two manifests serve different purposes:
 - `plugin/.claude-plugin/plugin.json` — the identity manifest the validator and Claude Desktop read (`name` must be kebab-case)
@@ -65,17 +64,19 @@ The validator (`scripts/validate-plugin.mjs`) checks:
 - Each `skills/*/` subdirectory contains a `SKILL.md`
 - `agents/`, `commands/`, `hooks/` (if present) contain files with the expected extension
 
-## Skill: /contract-review
+## Skill: /ai-tool-audit
 
-The single skill reads a contract the attorney attaches and, optionally, the firm's own `playbook.md` encoding its negotiation positions, from an attached workspace folder or pasted input, and:
-1. Determines which contract to review, asking if more than one is attached and unspecified.
-2. Uses the firm's own playbook if attached, or this plugin's bundled generic playbook if not — and says so plainly when the generic playbook is used.
-3. Matches each clause in the contract to the applicable playbook entry, rating it GREEN (meets the playbook position), YELLOW (within an acceptable fallback range), RED (conflicts with a must-have or trips a red-flag trigger), or UNRATED (the playbook in use doesn't cover this clause type) — never guessing a rating to fill a coverage gap.
-4. Suggests redline language for every clause that isn't GREEN, quoting the actual contract language and proposing a replacement — as chat text only, since the plugin cannot edit or generate a `.docx` file and never applies a Word tracked change.
-5. Never invents contract language not present in the attached contract, and never invents a firm position not encoded in the playbook it's using.
-6. Never decides whether the client should sign, walk away from, or accept the contract; never determines a clause's enforceability under governing law; never resolves choice-of-law or jurisdiction questions; never advises on privilege, confidentiality strategy, or tax consequences — those are the attorney's judgment calls, left as an explicit UNRATED flag or decline instead of a guess.
-7. Presents the full review with an explicit review invitation — the attorney confirms it before it's used in negotiation.
-8. Iterates on revisions as many times as needed; restates the final findings cleanly when confirmed.
+The single skill runs a short guided interview on the AI tools the firm currently uses, optionally starting from an existing AI-tools list attached to a workspace folder or pasted input, and:
+1. Confirms an attached inventory is complete before treating it as the full list, rather than assuming it is; asks from scratch if there's no existing list.
+2. For each tool, collects what it's used for, who uses it, what data it touches, and its data-handling status as the firm currently understands it — never inferring any of these from the tool's name or category alone.
+3. Rates each tool's data-handling status: 🟢 confirmed appropriate, 🟡 partial/mixed, 🔴 confirmed risk, or ⚪ UNCONFIRMED (the firm doesn't know the tool's current terms) — never guessing a status, and never asserting what a named vendor's terms actually are from its own training knowledge.
+4. Flags redundant tools by workflow — two or more tools serving the same stated task — without assuming overlap automatically means one must be eliminated.
+5. Recommends genuine consolidation candidates onto a governed Claude + MCP stack, each tied to the firm's specific stated workflow and the specific gap found; names tools to keep as specialized (practice management, docketing/deadline engines, e-discovery, e-signature) just as explicitly as tools recommended for consolidation — never a blanket "replace everything."
+6. Never invents an AI-tool inventory, a use case, or a data-handling status the firm didn't report.
+7. Never certifies compliance with any bar rule, ethics opinion, or security standard; never performs or claims a security assessment; never drafts the firm's actual AI-use policy or client-disclosure clause (that's CP3's job, not this skill's) — those are declined or flagged instead of answered.
+8. Never accesses, logs into, changes a setting on, migrates data from, or cancels anything at any vendor — the skill recommends, it does not act.
+9. Presents the full audit with an explicit review invitation — whoever ran the interview confirms it before it's treated as the firm's current inventory.
+10. Iterates on corrections and additions as many times as needed; restates the final findings cleanly when confirmed.
 
 Each `SKILL.md` has YAML frontmatter:
 ```yaml
@@ -90,21 +91,21 @@ argument-hint: "[hint shown in Claude Desktop]"
 
 These rules are enforced in `prompts/system-prompt.md` and `SKILL.md`. Do not weaken them:
 
-1. **Attorney review gate**: Claude must present every review and invite confirmation before marking it ready. It never declares a review final unilaterally.
-2. **No legal judgment**: the skill never decides whether to sign, walk away from, or accept a contract, never determines a clause's enforceability under governing law, never resolves a choice-of-law or jurisdiction question, and never advises on privilege, confidentiality strategy, or tax consequences — those are the attorney's judgment calls. A clause type the playbook in use doesn't cover is marked UNRATED, never guessed.
-3. **Required output wrapper**: Every skill output must carry the "ASSISTED CONTRACT REVIEW — ATTORNEY REVIEW REQUIRED BEFORE USE" header and the "Verify before use | Not legal advice" footer (see `prompts/system-prompt.md` for exact text) — both as chat-level text surrounding each review, never inside a redline suggestion the attorney copies into their own document.
-4. **Plan-tier warning**: The system prompt must warn that consumer-tier Claude (claude.ai Personal / Pro) must not be used to enter confidential client or contract information.
-5. **No facts invented**: The skill must never invent contract language not present in the attached contract, or a firm position not encoded in the playbook it's using. A clause type not covered by the playbook is flagged UNRATED, never rated by guesswork.
-6. **Ambiguity resolution**: The skill must ask which contract to review if more than one is attached and unspecified, and must mark a clause UNRATED (never silently assign a color) when the playbook in use doesn't address that clause type. Missing firm playbook is not an ambiguity to ask about — see rule 7.
-7. **Playbook fallback, not a refusal**: If no firm playbook is attached, the skill uses its own bundled generic playbook and says so plainly — it does not stop and ask for a playbook first. The generic playbook must never be presented as this firm's actual negotiation positions.
-8. **No external actions, no applied edits**: The skill never opens, edits, or generates a `.docx` file, never applies a Word tracked change, and never sends, files, executes, e-signs, or transmits the contract or the review to anyone. The attorney handles negotiation and execution manually.
+1. **Review gate**: Claude must present every audit and invite confirmation from whoever ran the interview before treating it as current. It never declares an audit final unilaterally.
+2. **No legal or compliance judgment**: the skill never certifies compliance with any bar rule, ethics opinion, or security standard; never opines that current tool use breaches the firm's confidentiality duty; never performs or claims a security assessment (no penetration testing, no independent vendor verification). Findings are flagged for the attorney or ethics counsel to confirm, never resolved by the skill.
+3. **Required output wrapper**: Every skill output must carry the "ASSISTED AI-TOOL AUDIT — ATTORNEY REVIEW REQUIRED BEFORE USE" header and the "Verify before use | Not legal advice" footer (see `prompts/system-prompt.md` for exact text) — both as chat-level text surrounding each audit, never inside an individual finding.
+4. **Plan-tier warning**: The system prompt must warn that consumer-tier Claude (claude.ai Personal / Pro) must not be used for an interview touching the firm's actual AI-tool landscape, and that the interview should describe data categories rather than real client names or matter numbers.
+5. **No facts invented**: The skill must never assert a named vendor's current data-handling terms from its own training knowledge. A tool's status is UNCONFIRMED when the firm doesn't know it, never guessed or asserted from general knowledge.
+6. **Ambiguity resolution**: An attached AI-tools inventory must be confirmed complete before being treated as the full list, never assumed. A tool named without a stated use case is asked about before being rated. A firm reporting no AI tools is asked to reconsider common ones before the skill accepts that and stops, rather than inventing an inventory to audit.
+7. **No external actions**: The skill never accesses, logs into, changes a setting on, migrates data from, or cancels anything at any vendor account, and never carries out its own consolidation recommendation. It produces chat text only — the firm, or a separate engagement, acts on it.
+8. **Scope boundaries, declined not answered**: The skill never drafts the firm's actual AI-use policy or a client-facing AI-disclosure clause (a separate skill's job) and never recommends replacing a genuinely specialized tool — practice management, docketing/deadline engines, e-discovery, e-signature — just because it appears in the inventory alongside general-purpose AI tools. Every consolidation recommendation must cite the firm's own stated workflow and the specific gap found; every "keep" recommendation must name the tool and the reason.
 
 ## Internal QA fixtures — tests/skills/
 
 `tests/skills/<skill-name>.md` is the internal QA testing guide for a skill — a standing convention for every plugin built in this repo, alongside (not replacing) the end-user testing guide in `plugin/README.md`. The difference:
 
 - `plugin/README.md` — ships inside the plugin zip, short scenarios with pasted one-liners, aimed at an attorney verifying the install.
-- `tests/skills/<skill-name>.md` — internal only, not packaged, uses real attached-folder fixtures under `tests/skills/<skill-name>/` when the skill's input is a workspace folder rather than chat text. Deeper checks (e.g., compliance-wrapper placement, playbook-vs-generic rating differences, coverage-gap edge cases) belong here even when they overlap with `plugin/README.md`'s scenarios.
+- `tests/skills/<skill-name>.md` — internal only, not packaged, uses real attached-folder fixtures under `tests/skills/<skill-name>/` for the attached-inventory path, plus scripted chat answers for the interview-only path. Deeper checks (e.g., compliance-wrapper placement, keep-vs-consolidate outcomes, UNCONFIRMED-status handling, out-of-scope requests) belong here even when they overlap with `plugin/README.md`'s scenarios.
 
 All fixture data must be clearly synthetic — fictional names, firms, matter numbers. Never use real client or matter data, even anonymized real data, without checking with Dele first.
 
@@ -116,19 +117,19 @@ Do not include `Co-Authored-By` attribution lines in commit messages.
 
 Used in `plugin/.claude-plugin/plugin.json` and any marketing copy — keep consistent:
 
-> A contract and document review assistant that reviews a contract clause-by-clause against a configurable playbook — flagging each clause GREEN, YELLOW, or RED with plain-English rationale and suggested redline language — using your firm's own playbook, or a generic clause playbook if none is attached, for solo and small-firm attorneys who review contracts occasionally and can't justify a $99-400/mo dedicated tool. Never decides whether to sign, negotiate, or reject a contract, and never sends, files, or executes anything; attorney reviews and finalizes every position before use.
+> An AI-tool audit assistant that runs a short guided interview on which AI tools your firm uses, for what, and with what data — flagging data-handling risks and redundant tools, and recommending genuine consolidation candidates onto a governed Claude + MCP stack mapped to your firm's actual workflows, for solo and small-firm attorneys managing an average of 18 different AI tools with no single source of truth. Never certifies compliance with any bar rule or security standard, and never accesses, changes, or cancels anything at any vendor; attorney reviews and confirms the audit before treating it as current.
 
 ## Testing
 
 Testing is manual inside Claude Desktop / Cowork — there is no test runner. The `plugin/README.md` is the canonical testing guide. It contains:
-- Setup steps (build → install → attach a test contract folder → verify skill loads)
+- Setup steps (build → install → optionally attach a test AI-tools inventory folder → verify skill loads)
 - 10 specific test inputs with exact text to paste and what to check for each
 
-Key scenarios that must pass: full review with a firm playbook attached (ratings tied to the firm's own positions), no firm playbook attached (skill uses the bundled generic playbook and says so, does not ask first), a clause type not covered by the playbook (skill marks it UNRATED, does not guess), more than one contract attached (skill asks which one), attorney asks whether to sign (skill declines), attorney asks about enforceability (skill declines), no contract attached, edit-and-revise loop, confirmation gate (no review marked ready, nothing sent or filed, until attorney confirms), redline-is-not-an-applied-edit (skill confirms it cannot touch the `.docx` file directly).
+Key scenarios that must pass: full audit with an existing inventory attached (skill confirms it's complete before proceeding), interview-only with nothing attached, a specialized tool present (skill recommends keeping it, not consolidating it), a confirmed data-handling risk (rated 🔴), an unconfirmed data-handling status (flagged ⚪, never guessed), redundant tools flagged by workflow, a firm reporting no AI tools (skill asks it to reconsider before accepting that), attorney asks for the firm's AI-use policy (skill declines, points to CP3), attorney asks the skill to act on its own recommendation (skill declines — audit and recommendation only), confirmation gate (no audit marked current, nothing at any vendor touched, until confirmed).
 
 ## Notes
 
-- `plugin/.mcp.json` is `{}` — this plugin requires no connector. Contract and playbook access come from Cowork's attached-workspace-folder model, which needs no separate config. Do not add a connector unless the skill explicitly needs one.
+- `plugin/.mcp.json` is `{}` — this plugin requires no connector. The interview runs in chat; an optional existing AI-tools inventory comes from Cowork's attached-workspace-folder model, which needs no separate config. Do not add a connector unless the skill explicitly needs one.
 - `plugin/manifest.json` has no `server` block — the plugin variant does not require one. Do not add one.
 - `plugin/README.md` and `plugin/CONNECTORS.md` are end-user documentation included in the ZIP bundle; they are not internal developer docs.
 - The root `.mcp.json` is gitignored — it holds workspace-level Claude Code MCP credentials and is not part of the plugin artifact.

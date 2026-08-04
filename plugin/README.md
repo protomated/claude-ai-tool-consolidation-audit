@@ -1,18 +1,18 @@
-# Contract & Document Review Skill for Law Firms — Claude Desktop Plugin
+# AI Tool Consolidation & Data-Hygiene Audit — Claude Desktop Plugin
 
-A Claude Desktop / Cowork plugin that reviews a contract clause by clause against a configurable playbook — flagging each clause GREEN, YELLOW, or RED with plain-English rationale and suggested redline language — using your firm's own playbook, or a generic clause playbook if you haven't attached your own, for solo and small-firm attorneys who review contracts occasionally and can't justify a dedicated $99–400/mo contract-review tool.
+A Claude Desktop / Cowork plugin that runs a short guided interview on which AI tools your firm uses, for what, and with what data — then produces a data-hygiene audit flagging data-handling risks and redundant tools, and recommending genuine consolidation candidates onto a governed Claude + MCP stack, for solo and small-firm attorneys managing an average of 18 different AI tools with no single source of truth.
 
 **Distributed by [Protomated](https://protomated.com) as a free download.**
 
 ---
 
-## ⚠️ Required: Read This Before You Install
+## ⚠️ Required: Read This Before You Run the Interview
 
-**This section is not boilerplate. Read it before attaching any contract.**
+**This section is not boilerplate. Read it before naming your firm's AI tools.**
 
 ### 1. You must be on a qualifying Claude plan
 
-Do NOT use this plugin on a consumer Claude plan (claude.ai Personal or Claude Pro) with any confidential client or contract information. Consumer plans do not provide a Data Processing Agreement (DPA) covering privileged content.
+Do NOT run this interview on a consumer Claude plan (claude.ai Personal or Claude Pro) if it will touch anything about your firm's actual client data flows. Consumer plans do not provide a Data Processing Agreement (DPA) covering that.
 
 Use one of the following:
 
@@ -20,19 +20,21 @@ Use one of the following:
 - **Claude Team or Enterprise**
 - **Claude API** (with a signed DPA from Anthropic)
 
-> **If you're not sure which plan you're on:** Open Claude Desktop → Help → About. If it says "Claude Pro," you are on a consumer plan. Upgrade to Claude for Work before attaching any confidential contract.
+> **If you're not sure which plan you're on:** Open Claude Desktop → Help → About. If it says "Claude Pro," you are on a consumer plan. Upgrade to Claude for Work first.
 
-### 2. Every review is a first pass — you are responsible for every position
+**Describe data categories, not real client names or matter numbers, while answering the interview.** The audit doesn't need actual client-identifying details to work.
 
-This plugin compares contract language to playbook positions and reports the result. It does not verify enforceability under any governing law, does not know your deal's business context beyond what's in the contract, and never decides whether to sign, negotiate, or reject anything. You review every rating and redline before using this review in negotiation.
+### 2. This is not a security assessment or a compliance certification
 
-### 3. FREE-tier playbook is generic, not your firm's positions
+This plugin builds its audit entirely from what you report about your own AI tools. It does not perform penetration testing, does not independently verify any vendor's claims, and does not certify that your current AI tool use complies with any bar rule, ethics opinion, or security standard. You're responsible for verifying anything the audit marks UNCONFIRMED, and for confirming compliance questions with ethics counsel or your state bar's AI guidance.
 
-If you don't attach your own `playbook.md`, the plugin uses its own bundled generic playbook — a conservative, general-purpose starting point for common commercial clause types, not this firm's actual negotiation positions. Treat every rating from it as something to confirm, not a final answer.
+### 3. It never states a vendor's terms from its own knowledge
 
-### 4. This plugin does not edit your document or send anything
+If you don't know a tool's data-handling terms — whether it's on a business tier, whether a DPA is signed, whether it trains on your inputs — say so. The skill marks that tool UNCONFIRMED and tells you to check with the vendor. It never asserts a specific product's current policy from its own training data; those terms change, and a wrong claim here is worse than an honest gap.
 
-The plugin reads only the workspace folder you explicitly attach. It cannot edit or generate a `.docx` file, so it never applies a Word tracked change — every suggested redline is chat text you copy into your own document. It never sends, files, or transmits your contract or the review to anyone.
+### 4. It recommends — it doesn't act
+
+The plugin produces an audit and a recommendation. It never logs into, changes a setting on, migrates data from, or cancels anything at any vendor account, and it never carries out the consolidation it recommends. You, your staff, or a separate engagement do that.
 
 ---
 
@@ -40,77 +42,93 @@ The plugin reads only the workspace folder you explicitly attach. It cannot edit
 
 ### Step 1 — Download and install
 
-1. Download `contract-document-reviewer.zip` from the [Releases page](https://github.com/protomated/claude-contract-document-reviewer/releases).
+1. Download `ai-tool-consolidation-audit.zip` from the [Releases page](https://github.com/protomated/claude-ai-tool-consolidation-audit/releases).
 2. Double-click the `.zip` file, or drag it into Claude Desktop's **Extensions** panel.
 3. Claude Desktop will install the plugin.
 
 No connectors to authorize. No credentials to configure.
 
-### Step 2 — Attach a contract (and, optionally, your firm's playbook)
+### Step 2 — (Optional) Attach an existing AI-tools list
 
-Before running the skill, attach a workspace folder containing:
-- The contract you want reviewed
-- Your firm's own `playbook.md`, if you have one — skip this and the plugin will use its own bundled generic playbook instead, clearly labeled as generic
+If your firm already has a written list of the AI tools it uses, attach it as a workspace folder before running the skill — the skill will confirm it's complete and fill in any missing detail through the interview. If you don't have one, skip this step; the skill interviews you from scratch.
 
 ### Step 3 — Verify
 
-Open a new Claude Desktop chat, attach your folder, and type `/skills`. You should see `/contract-review` listed. Run `/contract-review` to start.
+Open a new Claude Desktop chat and type `/skills`. You should see `/ai-tool-audit` listed. Run `/ai-tool-audit` to start.
 
 ---
 
 ## The Skill
 
-### `/contract-review` — Contract & Document Review
+### `/ai-tool-audit` — AI Tool Consolidation & Data-Hygiene Audit
 
-Reviews an attached contract clause by clause against a playbook:
+Runs a short guided interview on your firm's AI tools, then:
 
-1. Matches each clause to the applicable playbook position
-2. Rates it **GREEN** (meets the playbook position), **YELLOW** (within an acceptable fallback range), **RED** (conflicts with a must-have or trips a red-flag trigger), or **UNRATED** (not covered by the playbook in use)
-3. Suggests redline language for anything that isn't GREEN
+1. Builds a tool inventory — what each tool is used for, who uses it, what data it touches
+2. Rates each tool's data-handling status: **confirmed appropriate**, **partial/mixed**, **confirmed risk**, or **UNCONFIRMED** (never guessed)
+3. Flags redundant tools serving the same workflow
+4. Recommends genuine consolidation candidates onto a governed Claude + MCP stack — and names, just as plainly, which tools should stay exactly where they are
 
 **What you supply:**
-- The contract, via an attached folder or pasted directly
-- Your firm's own `playbook.md`, if you have one — the skill uses its bundled generic playbook (clearly labeled) if you don't
-- Anything requiring your judgment — the skill leaves a clause UNRATED rather than guessing
+- Answers to a short interview about which AI tools you use, for what, and with what data — about 10 minutes
+- An existing AI-tools list, if you have one, to speed the interview up
+- Verification of anything the audit marks UNCONFIRMED — the skill doesn't guess vendor terms
 
 **What it produces:**
-- A clause-by-clause review with plain-English rationale tied to specific playbook positions
-- Suggested redline language for YELLOW and RED clauses, as copy-ready chat text
-- A clear UNRATED flag for anything the playbook in use doesn't cover
+- A tool inventory table with a data-handling status per tool
+- A plain flag for any tool carrying sensitive data without confirmed protection
+- A redundancy note for any workflow covered by more than one tool
+- A consolidation recommendation tied to your firm's actual workflows — with genuinely specialized tools named as "keep," not silently ignored
 
 **What it does not do:**
-- It does not decide whether to sign, negotiate, or reject the contract — that's yours to decide
-- It does not determine enforceability under any governing law — verify this independently
-- It does not edit or generate a `.docx` file, or apply a Word tracked change — you apply every redline yourself
-- It does not send, file, or transmit the contract or the review to anyone
-- It does not invent contract language or firm positions not present in what you provide
+- It does not certify your firm's AI tool use as compliant with any bar rule, ethics opinion, or security standard
+- It does not perform a security assessment or independently verify a vendor's claims
+- It does not draft your firm's actual AI-use policy or a client-facing AI-disclosure clause — that's a separate scope this skill doesn't cover
+- It does not access, change, migrate, or cancel anything at any vendor, and doesn't carry out its own recommendation
+- It does not invent an inventory, a use case, or a data-handling status you didn't report
 
 **Example inputs:**
 
 ```
-/contract-review
-/contract-review vendor-services-agreement.docx
+/ai-tool-audit
+/ai-tool-audit [attach your existing AI-tools list first]
 ```
 
-**Typical use time:** a few minutes per contract once it's attached and, if you have one, your firm's playbook is attached alongside it.
-**Setup:** about 5 minutes (install plugin, attach a contract).
+**Typical use time:** about 10 minutes for the interview and first audit.
+**Setup:** about 5 minutes (install plugin).
+
+---
+
+## FAQ
+
+**Does this just pitch Protomated's services?**
+No — the audit is built from what you report, and it names tools to keep as plainly as tools to consolidate. If your firm's specialized practice management system or docketing engine is doing its job, the audit says so and doesn't recommend touching it. The consolidation recommendation only applies where a redundancy or a data-handling gap actually shows up in what you reported. Protomated does offer a paid Fractional Advisory engagement to actually carry out a consolidation, but the free audit works the same way whether or not you ever book that call.
+
+**Does this replace our firm's AI-use policy?**
+No. This skill audits your current tool landscape and recommends a stack — it does not draft an internal AI-use policy or a client-facing AI-disclosure clause. Drafting those is outside this skill's scope.
+
+**Is this a security or compliance certification?**
+No. It's built entirely from what you report in the interview, not an independent technical or legal review. Anything you don't know is marked UNCONFIRMED, not assumed safe.
+
+**Does it change anything about our actual tools?**
+No. It never logs into, changes, migrates, or cancels anything at any vendor. Every output is a recommendation for you to act on.
 
 ---
 
 ## Testing guide
 
-Run these inputs to verify the plugin is working correctly. Use synthetic or anonymized contract details, and attach a test folder with a sample contract and, optionally, a sample firm playbook.
+Run these inputs to verify the plugin is working correctly. Use synthetic or anonymized firm/tool details for every test.
 
-1. **Full review, firm playbook attached** — attach a folder with a contract and a firm `playbook.md`, run `/contract-review` → expect: every rating is tied to a specific entry in the attached playbook, not the bundled generic one
-2. **No firm playbook attached** — attach a folder with just the contract, run `/contract-review` → expect: skill uses the bundled generic playbook and says plainly that it's generic, not this firm's positions — it does not ask you to supply a playbook first
-3. **Clause type not covered by playbook** — include a clause type the playbook doesn't address → expect: skill marks it UNRATED and says so, rather than guessing GREEN/YELLOW/RED
-4. **More than one contract attached** — attach two contracts, run `/contract-review` with no argument → expect: skill asks which one to review, or whether to review both, before starting
-5. **Attorney asks whether to sign** — after a review, ask "should we sign this?" → expect: skill declines to decide, explains it's the attorney's call
-6. **Attorney asks about enforceability** — ask "is this limitation of liability clause enforceable in my state?" → expect: skill declines to give a definitive answer, points to the rating already given as a starting point
-7. **No contract attached** — run `/contract-review` with nothing attached → expect: skill asks the attorney to attach the contract or paste its text
-8. **Edit and revise loop** — after a review, say "re-check the termination clause" → expect: skill re-reviews just that clause without asking for unrelated new inputs, other findings carry over unchanged
-9. **Confirmation gate** — after any review, say "looks good" → expect: findings restated cleanly, skill does not send, file, or transmit anything anywhere
-10. **Redline is not applied to a file** — ask "can you apply these redlines directly to my Word doc?" → expect: skill explains it cannot edit or generate a `.docx` file, and that every redline is chat text to copy in yourself
+1. **Full audit, existing inventory attached** — attach a folder with an AI-tools list covering several tools, run `/ai-tool-audit` → expect: skill confirms the list is complete before proceeding, fills in missing detail through a short interview, and produces a full audit
+2. **Interview only, no attachment** — attach nothing, run `/ai-tool-audit` and answer the interview questions as they're asked → expect: skill builds the same kind of inventory purely from chat answers
+3. **Specialized tool, no consolidation recommended** — include a practice-management system or a court-deadline/docketing tool in the inventory → expect: skill rates it normally but explicitly recommends keeping it as specialized, naming the tool and the reason, rather than folding it into a consolidation recommendation
+4. **Data-handling risk flagged** — report a tool that handles client-identifying data on a consumer tier with no DPA → expect: skill rates it 🔴 confirmed risk and includes it in the Data-Handling Flags section with the specific reason
+5. **Unconfirmed data-handling status** — say "I don't know" when asked about a tool's data-handling terms → expect: skill marks it ⚪ UNCONFIRMED and tells you to verify with the vendor — it does not guess or assume it's fine
+6. **Redundant tools** — report two different tools used for the same workflow (e.g., two summarization tools) → expect: skill flags the overlap in Redundant/Overlapping Tools and considers it as a consolidation candidate, tied to that specific workflow
+7. **Firm has no AI tools** — respond "we don't use any AI tools" when asked → expect: skill asks you to reconsider common ones (dictation, research-tool AI features), and if you confirm there's genuinely nothing, it says so plainly and stops rather than inventing an inventory
+8. **Attorney asks for the firm's AI-use policy** — after an audit, ask "can you draft our AI-use policy from this?" → expect: skill declines, explains that's a separate skill's job
+9. **Attorney asks it to act** — ask "can you just cancel the redundant tool and set up the new stack for us?" → expect: skill declines, explains it produces the audit and recommendation only, and never accesses or changes anything at any vendor
+10. **Confirmation gate** — after any audit, say "looks good" → expect: findings restated cleanly; skill does not claim to have accessed, changed, or migrated anything anywhere
 
 ---
 
@@ -118,7 +136,7 @@ Run these inputs to verify the plugin is working correctly. Use synthetic or ano
 
 ```bash
 npm run build
-sha256sum -c contract-document-reviewer-v1.0.0.zip.sha256
+sha256sum -c ai-tool-consolidation-audit-v1.0.0.zip.sha256
 ```
 
 Both commands must exit 0. Install the `.zip` (not the `plugin/` directory) into a clean Claude Desktop to confirm the packaged artifact works end to end.
@@ -127,13 +145,13 @@ Both commands must exit 0. Install the `.zip` (not the `plugin/` directory) into
 
 ## Why This Matters
 
-Dedicated AI contract-review tools are priced for high transactional volume — $99–400/month — which doesn't pencil out for a solo or small-firm attorney reviewing contracts occasionally. Generic AI drafting, on the other hand, risks "grammatically correct but substantively wrong" output with no firm-specific positions constraining it. This plugin closes that gap: a playbook-constrained, clause-by-clause first pass that's good enough for occasional use, without pretending to replace your judgment on whether a clause actually works for this deal.
+Firms are accumulating AI tools faster than they're tracking what those tools do with client data — an average of about 18 different tools per firm, often adopted informally, each with its own data-handling terms nobody has fully reviewed. This plugin gives a firm a fast, honest first look at that sprawl: what's actually being used, what's carrying real data-hygiene risk, what's simply duplicated effort, and what's already working fine and shouldn't be touched.
 
 ---
 
-## Want Your Firm's Own Playbook Built In?
+## Want the Consolidation Actually Carried Out?
 
-This plugin ships with one generic playbook covering common commercial clause types. Protomated can build your firm's own multi-document, multi-clause playbook — encoding your actual negotiation positions across every contract type you review regularly — as a custom, done-for-you engagement.
+This plugin produces the audit and the recommendation. Protomated can carry out the actual migration to a governed Claude + MCP stack — staff training, a rollout plan, and ongoing oversight — as a Fractional Advisory engagement.
 
 [Book a 30-minute call →](https://protomated.com/call)
 
@@ -145,4 +163,4 @@ MIT. See [LICENSE](LICENSE).
 
 ## Feedback and Issues
 
-[GitHub Issues](https://github.com/protomated/claude-contract-document-reviewer/issues) | [hello@protomated.com](mailto:hello@protomated.com)
+[GitHub Issues](https://github.com/protomated/claude-ai-tool-consolidation-audit/issues) | [hello@protomated.com](mailto:hello@protomated.com)

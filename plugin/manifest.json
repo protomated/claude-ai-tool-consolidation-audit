@@ -1,16 +1,16 @@
 {
   "manifest_version": "0.2",
-  "name": "contract-document-reviewer",
-  "display_name": "Contract & Document Review Skill (Firm Playbook)",
+  "name": "ai-tool-consolidation-audit",
+  "display_name": "AI Tool Consolidation & Data-Hygiene Audit Skill",
   "version": "1.0.0",
-  "description": "One skill: /contract-review. Attach a contract and, optionally, your firm's own playbook.md; the skill reviews it clause-by-clause against the playbook, flagging each clause GREEN, YELLOW, or RED with plain-English rationale and suggested redline language. Attorney reviews every rating and redline before it's used in negotiation. Assisted review, always reviewed — never decides whether to sign, negotiate, or reject a contract, and never sends, files, or executes anything.",
+  "description": "One skill: /ai-tool-audit. Run a short guided interview on which AI tools your firm uses, for what, and with what data; the skill builds a tool inventory, rates each tool's data-handling status, flags redundant tools by workflow, and recommends genuine consolidation candidates onto a governed Claude + MCP stack — naming what should stay specialized just as plainly as what should consolidate. Assisted audit, always reviewed — never certifies compliance with any bar rule or security standard, and never accesses, changes, or cancels anything at any vendor.",
   "author": {
     "name": "Protomated",
     "url": "https://protomated.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/protomated/claude-contract-document-reviewer"
+    "url": "https://github.com/protomated/claude-ai-tool-consolidation-audit"
   },
   "license": "MIT"
 }
