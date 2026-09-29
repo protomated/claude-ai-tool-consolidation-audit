@@ -2,6 +2,9 @@
 name: ai-tool-audit
 description: Run a short guided interview on which AI tools the firm uses, for what, and with what data, then produce a data-hygiene audit — flagging data-handling risks, redundant tools, and genuine consolidation candidates — and recommend a governed Claude + MCP stack mapped to the firm's actual workflows. Never certifies compliance with any bar rule or security standard, never accesses or changes anything at any vendor, and never drafts the firm's AI-use policy itself.
 argument-hint: "[optional: paste or attach an existing AI-tools list to speed up the interview — the skill runs the interview either way to confirm details]"
+last_verified: 2026-09-29
+freshness_window: 12 months
+freshness_category: procedural
 ---
 
 # /ai-tool-audit — AI Tool Consolidation & Data-Hygiene Audit
