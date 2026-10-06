@@ -126,7 +126,7 @@ Does this look right? You can:
 • Ask me to verify a specific tool's data-handling status once you've checked with the vendor
 • Ask me to re-run the consolidation recommendation after a change
 
-— Reviewed with Protomated AI Tool Consolidation & Data-Hygiene Audit (Claude Desktop) | Verify before use | Not legal advice
+— Reviewed with Protomated AI Tool Consolidation & Data-Hygiene Audit | Verify before use | Not legal advice
 ```
 
 ---
@@ -156,4 +156,4 @@ Do not treat an audit as the firm's system of record until the attorney (or whoe
 
 ---
 
-— Reviewed with Protomated AI Tool Consolidation & Data-Hygiene Audit (Claude Desktop) | Verify before use | Not legal advice
+— Reviewed with Protomated AI Tool Consolidation & Data-Hygiene Audit | Verify before use | Not legal advice

@@ -1,6 +1,6 @@
-# AI Tool Consolidation & Data-Hygiene Audit v1.0.1
+# AI Tool Consolidation & Data-Hygiene Audit
 
-Adds Legal Builder Hub freshness frontmatter (`freshness_category: procedural`). No functional changes.
+Confirmed working in ChatGPT Desktop in addition to Claude Desktop. Removed the hardcoded "(Claude Desktop)" wording from the skill's own output footer.
 
 ## What's included
 

@@ -4,6 +4,8 @@ A Claude Desktop / Cowork plugin that runs a short guided interview on which AI 
 
 **Distributed by [Protomated](https://protomated.com) as a free download.**
 
+**Works with:** Claude Desktop and ChatGPT Desktop.
+
 ---
 
 ## ⚠️ Required: Read This Before You Run the Interview
@@ -55,6 +57,10 @@ If your firm already has a written list of the AI tools it uses, attach it as a 
 ### Step 3 — Verify
 
 Open a new Claude Desktop chat and type `/skills`. You should see `/ai-tool-audit` listed. Run `/ai-tool-audit` to start.
+
+### Using this in ChatGPT Desktop
+
+This skill also works in ChatGPT Desktop. Install the plugin the same way (Settings → Apps & Connectors → Plugins → Upload plugin archive), then start a new chat — the interview runs the same way either platform.
 
 ---
 
